@@ -1,5 +1,6 @@
 package com.franosch.paul.model;
 
+import com.franosch.paul.VectorCalculator;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -13,11 +14,27 @@ public class Graph {
     private final Set<Node> nodes;
     private final Set<Edge> edges;
     private final Map<Node, Set<Node>> neighbours;
+    private final Map<Node, Set<Edge>> neighbouringEdges;
 
     public Graph(final Set<Node> nodes, final Set<Edge> edges) {
         this.nodes = nodes;
         this.edges = edges;
         this.neighbours = this.calcNeighbours(nodes, edges);
+        this.neighbouringEdges = this.calcNeighbouringEdges(nodes, edges);
+    }
+
+    private Map<Node, Set<Edge>> calcNeighbouringEdges(final Set<Node> nodes, final Set<Edge> edges) {
+        Map<Node, Set<Edge>> map = new HashMap<>();
+        for (final Node node : nodes) {
+            Set<Edge> set = new HashSet<>();
+            for (final Edge edge : edges) {
+                if (edge.from().equals(node) || edge.to().equals(node)) {
+                    set.add(edge);
+                }
+            }
+            map.put(node, set);
+        }
+        return map;
     }
 
     private Map<Node, Set<Node>> calcNeighbours(Set<Node> nodes, Set<Edge> edges) {
@@ -43,5 +60,17 @@ public class Graph {
         System.out.println("smth went wrong finding an edge between node " + from + " and " + to);
         return null;
     }
+
+    public Set<Edge> getNext(Node current, Edge last) {
+        final Set<Edge> set = new HashSet<>();
+        for (final Edge next : this.neighbouringEdges.get(current)) {
+            double degree = VectorCalculator.calcDegree(last.vector(), next.vector());
+            if (degree > 90 && degree < 270) {
+                set.add(next);
+            }
+        }
+        return set;
+    }
+
 
 }
