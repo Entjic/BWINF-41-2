@@ -1,17 +1,24 @@
 package com.franosch.paul.model;
 
+import lombok.Getter;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class FlippingOrder implements Cloneable {
-    private final List<Integer> list = new ArrayList<>();
+    @Getter
+    private final List<Integer> flippingOperations = new ArrayList<>();
 
-    public void add(Integer integer) {
-        this.list.add(integer);
+    public FlippingOrder add(Integer integer) {
+        this.flippingOperations.add(integer);
+        return this;
     }
 
-    public List<Integer> getFlippingOperations() {
-        return this.list;
+    public FlippingOrder append(FlippingOrder flippingOrder) {
+        FlippingOrder copy = new FlippingOrder();
+        copy.getFlippingOperations().addAll(this.getFlippingOperations());
+        copy.getFlippingOperations().addAll(flippingOrder.getFlippingOperations());
+        return copy;
     }
 
     @Override
@@ -19,5 +26,12 @@ public class FlippingOrder implements Cloneable {
         FlippingOrder clone = new FlippingOrder();
         clone.getFlippingOperations().addAll(this.getFlippingOperations());
         return clone;
+    }
+
+    @Override
+    public String toString() {
+        return "FlippingOrder{" +
+                "flippingOperations=" + flippingOperations +
+                '}';
     }
 }

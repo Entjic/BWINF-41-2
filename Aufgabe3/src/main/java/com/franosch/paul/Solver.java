@@ -2,18 +2,22 @@ package com.franosch.paul;
 
 import com.franosch.paul.io.FileReader;
 import com.franosch.paul.model.FlippingOrder;
-import com.franosch.paul.model.FlippingOrderPancakeStackTuple;
 import com.franosch.paul.model.PancakeStack;
 import com.franosch.paul.model.PancakeStackSortingResult;
 import lombok.RequiredArgsConstructor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 @RequiredArgsConstructor
 public class Solver {
 
     public int findPWUE(int number) {
-        PancakeStackSorter pancakeSorter = new PancakeStackSorter();
+        PancakeFlipper pancakeFlipper = new PancakeFlipper();
+        PancakeFlippingOrderApplier pancakeFlippingOrderApplier = new PancakeFlippingOrderApplier(pancakeFlipper);
+        PancakeStackSorter pancakeSorter = new PancakeStackSorter(pancakeFlipper, pancakeFlippingOrderApplier);
 
         PancakeStackGenerator pancakeStackGenerator = new PancakeStackGenerator();
         Set<PancakeStack> pancakeStacks = pancakeStackGenerator.generateAllOfHeight(number);
@@ -22,20 +26,30 @@ public class Solver {
             PancakeStackSortingResult result = pancakeSorter.sort(pancakeStack);
             sorted.add(result);
         }
-        Collections.shuffle(sorted);
-        PancakeStackSortingResult highest = this.findHighest(sorted);
-        System.out.println("PWUE of number " + number + " is " + highest.getFlippingOrder().getFlippingOperations().size());
-        System.out.println("Pancake stack " + Arrays.toString(highest.getPrevious().getPancakes()) + " -> " + Arrays.toString(highest.getSolved().getPancakes()));
-        System.out.println("List of flipping operations " + highest.getFlippingOrder().getFlippingOperations());
-        return highest.getFlippingOrder().getFlippingOperations().size();
+        int highestOperations = this.findHighest(sorted).getFlippingOrder().getFlippingOperations().size();
+        sorted.stream().filter(result -> {
+            int size = result.getFlippingOrder().getFlippingOperations().size();
+            return size == highestOperations;
+        }).forEach(result -> System.out.println("Pancake stack "
+                + result.getPrevious().getPancakes() + " -> " + result.getSolved().getPancakes()
+                + " operations " + result.getFlippingOrder().getFlippingOperations()));
+        long count = sorted.stream().filter(result -> {
+            int size = result.getFlippingOrder().getFlippingOperations().size();
+            return size == highestOperations;
+        }).count();
+        System.out.println("PWUE of number " + number + " is " + highestOperations);
+        System.out.println("There are " + count + " worst case stacks");
+        return highestOperations;
     }
 
 
     public void solveFile(int number, boolean useTestResources) {
-        PancakeStackSorter pancakeSorter = new PancakeStackSorter();
+        PancakeFlipper pancakeFlipper = new PancakeFlipper();
+        PancakeFlippingOrderApplier pancakeFlippingOrderApplier = new PancakeFlippingOrderApplier(pancakeFlipper);
+        PancakeStackSorter pancakeSorter = new PancakeStackSorter(pancakeFlipper, pancakeFlippingOrderApplier);
         FileReader fileReader = new FileReader(useTestResources);
         PancakeStack pancakeStack = fileReader.read("pancake" + number);
-        pancakeSorter.sort(pancakeStack);
+        pancakeSorter.sort(pancakeStack, true);
     }
 
     private PancakeStackSortingResult findHighest(Collection<PancakeStackSortingResult> set) {

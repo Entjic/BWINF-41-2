@@ -60,5 +60,10 @@ public class PWUETest {
         Assertions.assertEquals(5, pwue);
     }
 
+    @Test
+    public void calcPWUE() {
+        solver.findPWUE(4); // 9 -> 5
+    }
+
 
 }
