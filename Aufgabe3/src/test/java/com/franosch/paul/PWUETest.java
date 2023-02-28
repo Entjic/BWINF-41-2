@@ -62,7 +62,26 @@ public class PWUETest {
 
     @Test
     public void calcPWUE() {
-        solver.findPWUE(4); // 9 -> 5
+        solver.findPWUE(11);
+        /*
+        PWUE of number 9 is 5
+        Pancake stack PancakeStackData{pancakes=[7, 3, 8, 9, 1, 5, 2, 6, 4]} -> PancakeStackData{pancakes=[9, 8, 5, 2]} operations [4, 5, 1, 3, 0]
+        There are 29091 worst case stacks
+        Timings report
+        Time spend finding PWUE nr 8297
+        Time spend generating pancake stacks 686
+        Time spend sorting pancake stacks 7611
+
+
+        PWUE of number 10 is 6
+        Pancake stack PancakeStackData{pancakes=[1, 6, 9, 3, 10, 2, 8, 4, 7, 5]} -> PancakeStackData{pancakes=[5, 4, 3, 2]} operations [0, 8, 1, 1, 2, 3]
+        There are 2547 worst case stacks
+        Timings report
+        Time spend finding PWUE nr 133560
+        Time spend generating pancake stacks 5311
+        Time spend sorting pancake stacks 128249
+
+        */
     }
 
 
