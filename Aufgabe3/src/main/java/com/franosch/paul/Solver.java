@@ -6,10 +6,7 @@ import com.franosch.paul.model.PancakeStack;
 import com.franosch.paul.model.PancakeStackSortingResult;
 import lombok.RequiredArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class Solver {
@@ -20,24 +17,24 @@ public class Solver {
         PancakeStackSorter pancakeSorter = new PancakeStackSorter(pancakeFlipper, pancakeFlippingOrderApplier);
 
         PancakeStackGenerator pancakeStackGenerator = new PancakeStackGenerator();
-        System.out.println("generating pancake stacks");
+        System.out.println("generating and solving pancake stacks");
         long preGen = System.currentTimeMillis();
-        Set<PancakeStack> pancakeStacks = pancakeStackGenerator.generateAllOfHeight(number);
+        Set<PancakeStackSortingResult> sorted = pancakeStackGenerator
+                .generateAllOfHeightAndApply(number,
+                        pancakeSorter::sort);
         long postGen = System.currentTimeMillis();
         System.out.println("sorting pancake stacks");
-        List<PancakeStackSortingResult> sorted = new ArrayList<>();
-        for (final PancakeStack pancakeStack : pancakeStacks) {
-            PancakeStackSortingResult result = pancakeSorter.sort(pancakeStack);
-            sorted.add(result);
-        }
         int highestOperations = this.findHighest(sorted).getFlippingOrder().getFlippingOperations().size();
+        System.out.println("10 random chosen worst case pancake stacks");
         sorted.stream().filter(result -> {
-            int size = result.getFlippingOrder().getFlippingOperations().size();
-            return size == highestOperations;
-        }).forEach(result -> System.out.println("Pancake stack "
-                + result.getPrevious().getPancakes() + " -> " + result.getSolved().getPancakes()
-                + " operations " + result.getFlippingOrder().getFlippingOperations()));
-        long postSort = System.currentTimeMillis();
+                    int size = result.getFlippingOrder().getFlippingOperations().size();
+                    return size == highestOperations;
+                })
+                .sorted(new RandomComparator<>()) // random shuffle
+                .limit(10)
+                .forEach(result -> System.out.println("Pancake stack "
+                        + result.getPrevious().getPancakes() + " -> " + result.getSolved().getPancakes()
+                        + " operations " + result.getFlippingOrder().getFlippingOperations()));
         long count = sorted.stream().filter(result -> {
             int size = result.getFlippingOrder().getFlippingOperations().size();
             return size == highestOperations;
@@ -46,9 +43,7 @@ public class Solver {
         System.out.println("There are " + count + " worst case stacks");
 
         System.out.println("Timings report");
-        System.out.println("Time spend finding PWUE nr " + (postSort - preGen));
-        System.out.println("Time spend generating pancake stacks " + (postGen - preGen));
-        System.out.println("Time spend sorting pancake stacks " + (postSort - postGen));
+        System.out.println("Time spend finding PWUE nr " + (postGen - preGen) + " ms");
 
         return highestOperations;
     }
@@ -74,6 +69,33 @@ public class Solver {
             }
         }
         return highest;
+    }
+
+
+    private static final class RandomComparator<T> implements Comparator<T> {
+
+        private final Map<T, Integer> map = new IdentityHashMap<>();
+        private final Random random;
+
+        public RandomComparator() {
+            this(new Random());
+        }
+
+        public RandomComparator(Random random) {
+            this.random = random;
+        }
+
+        @Override
+        public int compare(T t1, T t2) {
+            return Integer.compare(valueFor(t1), valueFor(t2));
+        }
+
+        private int valueFor(T t) {
+            synchronized (map) {
+                return map.computeIfAbsent(t, ignore -> random.nextInt());
+            }
+        }
+
     }
 
 
