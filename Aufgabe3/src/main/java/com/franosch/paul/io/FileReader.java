@@ -20,19 +20,19 @@ public class FileReader {
         File file = new File(getCurrentPath(useTestResources) + name + ".txt");
         Scanner scanner = new Scanner(file);
         boolean skip = true;
-        List<Integer> pancakes = new ArrayList<>();
+        List<Byte> pancakes = new ArrayList<>();
         while (scanner.hasNextLine()) {
             String data = scanner.nextLine();
             if (skip) {
                 skip = false;
                 continue;
             }
-            pancakes.add(Integer.parseInt(data));
+            pancakes.add(Byte.parseByte(data));
 
         }
         scanner.close();
         Collections.reverse(pancakes);
-        Integer[] array = pancakes.toArray(new Integer[0]);
+        Byte[] array = pancakes.toArray(new Byte[0]);
         return new PancakeStack(array);
     }
 

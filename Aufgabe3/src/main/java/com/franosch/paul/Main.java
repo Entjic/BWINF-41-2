@@ -27,7 +27,7 @@ public class Main {
                         System.exit(0);
                     }
                     solver.solveFile(Integer.parseInt(fileInput), true);
-                    System.exit(0);
+                    // System.exit(0);
                 }
                 case 2 -> {
                     System.out.println("Du befindest dich nun im PWUE-Zahl Modus.");
@@ -38,7 +38,7 @@ public class Main {
                         System.exit(0);
                     }
                     int pwue = solver.findPWUE(Integer.parseInt(heightInput));
-                    System.exit(0);
+                    // System.exit(0);
                 }
                 default -> System.out.println("Es stehen nur die Modi 1 und 2 zur verfügung!");
             }

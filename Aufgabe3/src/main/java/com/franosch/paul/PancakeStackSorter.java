@@ -18,6 +18,11 @@ public class PancakeStackSorter {
 
     private final Map<PancakeStackData, FlippingOrder> flippingOrderMap = new HashMap<>();
 
+    public int getMapEntryCount() {
+        return this.flippingOrderMap.size();
+    }
+
+
     public PancakeStackSortingResult sort(PancakeStack pancakeStack) {
         FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
         PancakeStack solved = this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
@@ -25,7 +30,7 @@ public class PancakeStackSorter {
     }
 
     public PancakeStackSortingResult sort(PancakeStack pancakeStack, boolean debugPrints) {
-        if (! debugPrints) {
+        if (!debugPrints) {
             return this.sort(pancakeStack);
         }
         System.out.println("Input pancake stack " + pancakeStack.getNormalizedPancakes());
@@ -46,7 +51,7 @@ public class PancakeStackSorter {
             return flippingOrder.append(this.flippingOrderMap.get(pancakeStack.getNormalizedPancakes()));
         }
         Set<FlippingOrder> options = new HashSet<>();
-        for (int i = 0; i < pancakeStack.getNormalizedPancakes().getPancakes().length; i++) {
+        for (byte i = 0; i < pancakeStack.getNormalizedPancakes().getPancakes().length; i++) {
             PancakeStack clonedPancakeStack = pancakeStack.clone();
             this.pancakeFlipper.flip(clonedPancakeStack, i);
             FlippingOrder clonedFlippingOrder = flippingOrder.clone();

@@ -13,7 +13,7 @@ public class PancakeFlippingOrderApplier {
         if (flippingOrder.getFlippingOperations().size() == 0) {
             return pancakeStack;
         }
-        for (Integer flippingOperation : flippingOrder.getFlippingOperations()) {
+        for (Byte flippingOperation : flippingOrder.getFlippingOperations()) {
             flipper.flip(pancakeStack, flippingOperation);
         }
         return pancakeStack;

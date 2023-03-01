@@ -7,9 +7,9 @@ import java.util.List;
 
 public class FlippingOrder implements Cloneable {
     @Getter
-    private final List<Integer> flippingOperations = new ArrayList<>();
+    private final List<Byte> flippingOperations = new ArrayList<>();
 
-    public FlippingOrder add(Integer integer) {
+    public FlippingOrder add(Byte integer) {
         this.flippingOperations.add(integer);
         return this;
     }

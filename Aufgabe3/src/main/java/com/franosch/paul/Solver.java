@@ -23,13 +23,15 @@ public class Solver {
                 .generateAllOfHeightAndApply(number,
                         pancakeSorter::sort);
         long postGen = System.currentTimeMillis();
-        System.out.println("sorting pancake stacks");
-        int highestOperations = this.findHighest(sorted).getFlippingOrder().getFlippingOperations().size();
+        int highestOperations = sorted
+                .stream()
+                .findFirst()
+                .orElseThrow(IllegalStateException::new)
+                .getFlippingOrder()
+                .getFlippingOperations()
+                .size();
         System.out.println("10 random chosen worst case pancake stacks");
-        sorted.stream().filter(result -> {
-                    int size = result.getFlippingOrder().getFlippingOperations().size();
-                    return size == highestOperations;
-                })
+        sorted.stream()
                 .sorted(new RandomComparator<>()) // random shuffle
                 .limit(10)
                 .forEach(result -> System.out.println("Pancake stack "
@@ -42,12 +44,13 @@ public class Solver {
         System.out.println("PWUE of number " + number + " is " + highestOperations);
         System.out.println("There are " + count + " worst case stacks");
 
+        System.out.println("Sorter map contains " + pancakeSorter.getMapEntryCount() + " entries");
+
         System.out.println("Timings report");
         System.out.println("Time spend finding PWUE nr " + (postGen - preGen) + " ms");
 
         return highestOperations;
     }
-
 
     public void solveFile(int number, boolean useTestResources) {
         PancakeFlipper pancakeFlipper = new PancakeFlipper();
@@ -57,20 +60,6 @@ public class Solver {
         PancakeStack pancakeStack = fileReader.read("pancake" + number);
         pancakeSorter.sort(pancakeStack, true);
     }
-
-    private PancakeStackSortingResult findHighest(Collection<PancakeStackSortingResult> set) {
-        int smallestValue = Integer.MIN_VALUE;
-        PancakeStackSortingResult highest = null;
-        for (final PancakeStackSortingResult flippingOrderPancakeStackTuple : set) {
-            FlippingOrder flippingOrder = flippingOrderPancakeStackTuple.getFlippingOrder();
-            if (flippingOrder.getFlippingOperations().size() > smallestValue) {
-                smallestValue = flippingOrder.getFlippingOperations().size();
-                highest = flippingOrderPancakeStackTuple;
-            }
-        }
-        return highest;
-    }
-
 
     private static final class RandomComparator<T> implements Comparator<T> {
 

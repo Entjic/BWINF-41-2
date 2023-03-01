@@ -8,7 +8,7 @@ import java.util.Arrays;
 @Getter
 @AllArgsConstructor
 public class PancakeStackData implements Cloneable {
-    private Integer[] pancakes; // bottom to top
+    private Byte[] pancakes; // bottom to top
 
     @Override
     public String toString() {

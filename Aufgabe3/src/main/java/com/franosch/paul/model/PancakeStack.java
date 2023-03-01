@@ -12,19 +12,16 @@ public class PancakeStack implements Cloneable {
     private PancakeStackData normalizedPancakes; // bottom to top
     private PancakeStackData pancakes; // bottom to top, using actual pancake sizes
 
-    public PancakeStack(Integer[] pancakes) {
+    public PancakeStack(Byte[] pancakes) {
         this.normalizedPancakes = new PancakeStackData(pancakes);
         this.pancakes = new PancakeStackData(pancakes);
     }
 
-    public PancakeStack(Integer[] normalizedPancakes, Integer[] pancakes) {
-        this.normalizedPancakes = new PancakeStackData(normalizedPancakes);
-        this.pancakes = new PancakeStackData(pancakes);
-    }
+
 
     public boolean isSolved() {
         int last = - 1;
-        for (final Integer pancake : this.normalizedPancakes.getPancakes()) {
+        for (final Byte pancake : this.normalizedPancakes.getPancakes()) {
             if (last == - 1) {
                 last = pancake;
                 continue;
