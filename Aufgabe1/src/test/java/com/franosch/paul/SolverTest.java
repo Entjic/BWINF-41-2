@@ -1,50 +1,58 @@
 package com.franosch.paul;
 
+import com.franosch.paul.solver.SolvingStrategy;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class SolverTest {
 
-    @Test
-    public void solveFirst() {
-        Solver solver = new Solver(1, true);
-        solver.solve(); // current best 2019.348
+    private TravelingSalesmanSolver solver;
+
+    @BeforeEach
+    public void setUp() {
+        solver = new TravelingSalesmanSolver();
     }
 
     @Test
-    public void solveSecond() {
-        Solver solver = new Solver(2, true);
-        solver.solve(); // current best 4487.818
+    public void solveFirstByShortestEdgeFirst() {
+        solver.solve(1, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/qifafudoli.css
     }
 
     @Test
-    public void solveThird() {
-        Solver solver = new Solver(3, true);
-        solver.solve(); // current best 3834.651
+    public void solveSecondByShortestEdgeFirst() {
+        solver.solve(2, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/kefegobeja.css
     }
 
     @Test
-    public void solveFourth() {
-        Solver solver = new Solver(4, true);
-        solver.solve(); // current best 2030.169
-        
+    public void solveThirdByShortestEdgeFirst() {
+        solver.solve(3, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/xayigarati.css
     }
 
     @Test
-    public void solveFifth() {
-        Solver solver = new Solver(5, true);
-        solver.solve(); // current best 4618.504
+    public void solveFourthByShortestEdgeFirst() {
+        solver.solve(4, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/kicemeyoga.css
     }
 
     @Test
-    public void solveSixth() {
-        Solver solver = new Solver(6, true);
-        solver.solve(); // current best 5801.475
+    public void solveFifthByShortestEdgeFirst() { // TODO: 29.03.2023 prove this is not solvable
+        solver.solve(5, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/aqigunotub.css
     }
 
     @Test
-    public void solveSeventh() {
-        Solver solver = new Solver(7, true);
-        solver.solve(); // current best 6998.678
+    public void solveSixthByShortestEdgeFirst() {
+        solver.solve(6, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/joxezedezo.css
+    }
+
+    @Test
+    public void solveSeventhByShortestEdgeFirst() {
+        solver.solve(7, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        // https://paste.myplayplanet.tools/iyufokufak.css
     }
 
 

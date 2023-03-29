@@ -11,5 +11,9 @@ public record Vector(double x, double y) {
         return new Vector(x, y);
     }
 
+    public static Vector inverse(Vector vector) {
+        return new Vector(-vector.x(), -vector.y());
+    }
+
 
 }

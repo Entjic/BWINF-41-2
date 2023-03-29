@@ -6,13 +6,15 @@ public final class Edge {
     private final Node from;
     private final Node to;
     private final Double weight;
-    private final Vector vector;
+    private final Vector vectorFrom;
+    private final Vector vectorTo;
 
     public Edge(Node from, Node to, Double weight) {
         this.from = from;
         this.to = to;
         this.weight = weight;
-        this.vector = Vector.of(this);
+        this.vectorFrom = Vector.of(this);
+        this.vectorTo = Vector.inverse(this.vectorFrom);
     }
 
     public Node flip(Node current) {
@@ -40,7 +42,8 @@ public final class Edge {
                 "from=" + from +
                 ", to=" + to +
                 ", weight=" + weight +
-                ", vector=" + vector +
+                ", vectorFrom=" + vectorFrom +
+                ", vectorTo=" + vectorTo +
                 '}';
     }
 
@@ -56,8 +59,14 @@ public final class Edge {
         return weight;
     }
 
-    public Vector vector() {
-        return vector;
+    public Vector vector(Node base) {
+        if (base.equals(to())) {
+            return this.vectorTo;
+        }
+        if (base.equals(from())) {
+            return this.vectorFrom;
+        }
+        throw new IllegalArgumentException();
     }
 
 }

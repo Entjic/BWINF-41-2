@@ -1,6 +1,6 @@
 package com.franosch.paul.model;
 
-import com.franosch.paul.VectorCalculator;
+import com.franosch.paul.util.VectorCalculator;
 import lombok.Getter;
 
 import java.util.HashMap;
@@ -52,7 +52,7 @@ public class Graph {
     }
 
     public Edge getEdge(Node from, Node to) {
-        for (final Edge edge : this.edges) {
+        for (final Edge edge : this.getNeighbouringEdges().get(from)) {
             if (edge.from().equals(from) && edge.to().equals(to) || edge.to().equals(from) && edge.from().equals(to)) {
                 return edge;
             }
@@ -61,15 +61,8 @@ public class Graph {
         return null;
     }
 
-    public Set<Edge> getNext(Node current, Edge last) {
-        final Set<Edge> set = new HashSet<>();
-        for (final Edge next : this.neighbouringEdges.get(current)) {
-            double degree = VectorCalculator.calcDegree(last.vector(), next.vector());
-            if (degree > 90 && degree < 270) {
-                set.add(next);
-            }
-        }
-        return set;
+    public Node getNodeById(int id) {
+        return this.nodes.stream().filter(node -> node.id() == id).findAny().orElseThrow();
     }
 
 

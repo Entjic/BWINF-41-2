@@ -47,9 +47,6 @@ public class Main {
 
     }
 
-    private static void printHelp() {
-    }
-
     private static boolean isInt(String input) {
         try {
             Integer.parseInt(input);

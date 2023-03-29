@@ -56,8 +56,9 @@ public class PancakeStackGenerator {
             if (size > currentWorstCase) {
                 this.currentWorstCase = size;
                 results.clear();
+                results.add(pancakeStackSortingResult); // just for testing purpose
             }
-            results.add(pancakeStackSortingResult);
+            // results.add(pancakeStackSortingResult);
         }
     }
 

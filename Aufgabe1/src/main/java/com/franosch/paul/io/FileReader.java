@@ -6,26 +6,19 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.Scanner;
-import java.util.Set;
+import java.util.*;
 
 @RequiredArgsConstructor
 public class FileReader {
     private final boolean useTestResources;
 
     @SneakyThrows
-    public Set<Point> read(String name) {
+    public List<Point> read(String name) {
         File file = new File(getCurrentPath(useTestResources) + name + ".txt");
         Scanner scanner = new Scanner(file);
-        boolean skip = true;
-        Set<Point> points = new HashSet<>();
+        List<Point> points = new ArrayList<>();
         while (scanner.hasNextLine()) {
             String data = scanner.nextLine();
-            if (skip) {
-                skip = false;
-                continue;
-            }
             final String[] split = data.split(" ");
             Point point = new Point(Double.parseDouble(split[0]), Double.parseDouble(split[1]));
             points.add(point);
