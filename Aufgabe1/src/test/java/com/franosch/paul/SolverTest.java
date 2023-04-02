@@ -1,8 +1,16 @@
 package com.franosch.paul;
 
+import com.franosch.paul.model.Graph;
+import com.franosch.paul.model.Node;
+import com.franosch.paul.solver.NearestNeighbourHeuristic;
 import com.franosch.paul.solver.SolvingStrategy;
+import com.franosch.paul.solver.post_optimization.ParameterConfiguration;
+import com.franosch.paul.solver.post_optimization.ParameterTestSuit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 public class SolverTest {
 
@@ -53,6 +61,22 @@ public class SolverTest {
     public void solveSeventhByShortestEdgeFirst() {
         solver.solve(7, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
         // https://paste.myplayplanet.tools/iyufokufak.css
+    }
+
+    @Test
+    public void findGoodParameter() {
+        ParameterTestSuit parameterTestSuit = new ParameterTestSuit();
+        GraphGenerator graphGenerator = new GraphGenerator(6, true);
+        final Graph graph = graphGenerator.generateGraph();
+        final Node startNode = graphGenerator.findStartNode(graph);
+        NearestNeighbourHeuristic nearestNeighbourHeuristic = new NearestNeighbourHeuristic();
+        final List<Node> solve = nearestNeighbourHeuristic.solve(graph, startNode);
+        final Map.Entry<ParameterConfiguration, Double> goodParameter =
+                parameterTestSuit.findGoodParameter(graph, solve);
+
+        System.out.println("best config " + goodParameter.getKey());
+        System.out.println("best result " + goodParameter.getValue());
+
     }
 
 
