@@ -1,9 +1,11 @@
-package com.franosch.paul.solver;
+package com.franosch.paul.solver.nearest_neighbour;
 
 import com.franosch.paul.model.Edge;
 import com.franosch.paul.model.Graph;
 import com.franosch.paul.model.Node;
-import com.franosch.paul.util.VectorCalculator;
+import com.franosch.paul.solver.Solver;
+import com.franosch.paul.solver.SolvingStrategy;
+import com.franosch.paul.solver.nearest_neighbour.next_edge.WeightedNextEdgeProvider;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
@@ -15,6 +17,8 @@ public class NearestNeighbourHeuristic implements Solver {
     private boolean solutionFound = false;
 
     private List<Node> solution = null;
+
+    private final WeightedNextEdgeProvider weightedNextEdgeProvider;
 
     @Override
     public List<Node> solve(final Graph graph, Node start) {
@@ -48,7 +52,7 @@ public class NearestNeighbourHeuristic implements Solver {
         // System.out.println("nodes unvisited " + open.size());
         // System.out.println("current node " + current.id());
 
-        List<Edge> possibleNext = this.calcPossibleNext(graph, current, last, open);
+        List<Edge> possibleNext = this.weightedNextEdgeProvider.calcPossibleNext(graph, current, last, open);
 
         // System.out.println("possible next " + possibleNext);
 
@@ -58,37 +62,5 @@ public class NearestNeighbourHeuristic implements Solver {
         }
     }
 
-    private List<Edge> calcPossibleNext(Graph graph, Node current, Edge last, Set<Node> open) {
-        List<Edge> possibleNext;
-
-        if (last == null) {
-            possibleNext = new ArrayList<>(graph.getNeighbouringEdges().get(current));
-        } else {
-            possibleNext = new ArrayList<>(this.getNext(graph, current, last));
-        }
-
-        possibleNext.sort(Comparator.comparingDouble(Edge::weight));
-
-        List<Edge> result = new ArrayList<>();
-
-        for (final Edge edge : possibleNext) {
-            Node next = edge.flip(current);
-            if (open.contains(next)) {
-                result.add(edge);
-            }
-        }
-        return result;
-
-    }
-
-    public Set<Edge> getNext(Graph graph, Node current, Edge last) {
-        final Set<Edge> set = new HashSet<>();
-        for (final Edge next : graph.getNeighbouringEdges().get(current)) {
-            if (VectorCalculator.matchesAngleCriteria(last.vector(current), next.vector(current))) {
-                set.add(next);
-            }
-        }
-        return set;
-    }
 
 }

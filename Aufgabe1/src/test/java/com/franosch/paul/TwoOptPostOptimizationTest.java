@@ -1,12 +1,12 @@
 package com.franosch.paul;
 
 import com.franosch.paul.eval.SolutionEvaluator;
-import com.franosch.paul.model.Edge;
 import com.franosch.paul.model.Graph;
 import com.franosch.paul.model.Node;
-import com.franosch.paul.solver.NearestNeighbourHeuristic;
+import com.franosch.paul.solver.nearest_neighbour.NearestNeighbourHeuristic;
+import com.franosch.paul.solver.nearest_neighbour.next_edge.AngleCriteriaNextEdgeProvider;
+import com.franosch.paul.solver.nearest_neighbour.next_edge.WeightedNextEdgeProvider;
 import com.franosch.paul.solver.post_optimization.TwoOptPostOptimization;
-import com.franosch.paul.util.VectorCalculator;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +18,11 @@ public class TwoOptPostOptimizationTest {
 
     @Test
     public void test() {
-        NearestNeighbourHeuristic nearestNeighbourHeuristic = new NearestNeighbourHeuristic();
+        NearestNeighbourHeuristic nearestNeighbourHeuristic = new NearestNeighbourHeuristic(
+                new WeightedNextEdgeProvider(
+                        new AngleCriteriaNextEdgeProvider()
+                )
+        );
         GraphGenerator graphGenerator = new GraphGenerator(0, true);
         Graph graph = graphGenerator.generateGraph();
         Node start = graphGenerator.findStartNode(graph);
@@ -53,7 +57,7 @@ public class TwoOptPostOptimizationTest {
         Node seven = graph.getNodeById(7);
         List<Node> tour = List.of(zero, one, two, three, four, five, six, seven);
         List<Node> optimized = twoOptPostOptimization.optimize(graph, new ArrayList<>(
-                tour));
+                tour), 10000);
 
         AngleCriteriaAsserter angleCriteriaAsserter = new AngleCriteriaAsserter();
 

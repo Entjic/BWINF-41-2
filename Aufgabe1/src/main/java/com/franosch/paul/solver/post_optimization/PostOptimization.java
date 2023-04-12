@@ -10,6 +10,6 @@ import java.util.List;
  */
 public interface PostOptimization {
 
-    List<Node> optimize(Graph graph, List<Node> nodes);
+    List<Node> optimize(Graph graph, List<Node> nodes, long timeLimit);
 
 }

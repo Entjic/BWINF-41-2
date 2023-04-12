@@ -45,7 +45,7 @@ public class TwoOptPostOptimization implements PostOptimization {
     }
 
     @Override
-    public List<Node> optimize(final Graph graph, final List<Node> tour) {
+    public List<Node> optimize(final Graph graph, final List<Node> tour, long timeLimit) {
         // TODO: 29.03.2023 optimize data structure of tour
 
         List<Node> current = new ArrayList<>(tour);
@@ -54,13 +54,13 @@ public class TwoOptPostOptimization implements PostOptimization {
 
         int improvingIterations = 0;
         int iterations = 0;
-        long thirtySec = System.currentTimeMillis() + 10000;
+        long stopAfterTimeLimit = System.currentTimeMillis() + timeLimit;
 
-        while (System.currentTimeMillis() < thirtySec) {
-            ResultType improved = this.improve(graph, current);
-            double nextLength = solutionEvaluator.evaluate(graph, current);
+        while (System.currentTimeMillis() < stopAfterTimeLimit) {
+            ResultType improved = this.improve(graph, current, stopAfterTimeLimit);
+            // double nextLength = solutionEvaluator.evaluate(graph, current);
             // System.out.println("improvement of " + (currentLength - nextLength));
-            currentLength = nextLength;
+            // currentLength = nextLength;
             if (improvingIterations == improvingIterationsUntilCooling) {
                 improvingIterations = 0;
                 iterations = 0;
@@ -83,8 +83,8 @@ public class TwoOptPostOptimization implements PostOptimization {
         return current;
     }
 
-    private ResultType improve(Graph graph, List<Node> current) {
-        while (true) {
+    private ResultType improve(Graph graph, List<Node> current, long timeLimit) {
+        while (System.currentTimeMillis() < timeLimit) {
 
             int first = this.randomInRange(1, current.size() - 5);
             int second = this.randomInRange(first + 3, current.size() - 3);
@@ -140,6 +140,7 @@ public class TwoOptPostOptimization implements PostOptimization {
                 return ResultType.WORSE;
             }
         }
+        return ResultType.ZERO;
     }
 
     private int randomInRange(int from, int to) {
