@@ -3,21 +3,37 @@
 
 \vspace{0.5cm}
 
-\textbf{Anleitung:} Trage oben in den Zeilen 8 bis 10 die Aufgabennummer, die Teilnahme-ID und die/den Bearbeiterin/Bearbeiter dieser Aufgabe mit Vor- und Nachnamen ein.
-Vergiss nicht, auch den Aufgabennamen anzupassen (statt "`\LaTeX-Dokument"')!
-
-Dann kannst du dieses Dokument mit deiner \LaTeX-Umgebung übersetzen.
-
-Die Texte, die hier bereits stehen, geben ein paar Hinweise zur Einsendung.
-Du solltest sie aber in deiner Einsendung wieder entfernen!
-
 
 \section{Lösungsidee}\label{sec:losungsidee}
-Die Idee der Lösung sollte hieraus vollkommen ersichtlich werden, ohne dass auf die eigentliche Implementierung Bezug genommen wird.
+Das Problem der Aufgabenstellung beschreibt eine Variante des NP-vollständigen Traveling-Salesman Problems.
+Es ist somit nicht möglich optimale Lösungen in polynomieller Zeit für beliebige Graphen zu finden.
+Für die Graphen aus den Beispieldateien ist dies aufgrund ihrer Größe auch nicht möglich.
+Folglich müssen zur Bewältigung der Aufgabe Heuristiken herangezogen werden. \\
+Zunächst wird eine initiale Lösung mittels der Nearest-Neighbour Heuristik ermittelt.
+Diese wird danach iterativ durch die TwoOpt-Postoptimierung verbessert.
+
+\subsection{Nearest-Neighbour Heuristik}\label{subsec:nearest-neighbour-heuristik}
+1.
+Zunächst wird ein Startknoten \textit{v}\textsubscript{Start} ermittelt.
+Ausgehend von \textit{v}\textsubscript{Start}, wird der Knoten \textit{v}\textsubscript{0} mit der geringsten Distanz gewählt.
+\textit{v}\textsubscript{Start} und \textit{v}\textsubscript{0} werden als besucht markiert.
+Die Kante \textit{e} zwischen diesen beiden Knoten wird für die Suche des nächsten Knotens genutzt.
+
+2.
+Solange es noch unbesuchte Knoten gibt, wird folgendes Verfahren wiederholt:
+Betrachte in aufsteigender Distanz zu \textit{v}\textsubscript{0} alle Knoten.
+Wenn die Kante, die den aktuell betrachteten Knoten und \textit{v}\textsubscript{0} verbindet \textit{e}
+in einem stumpfen Winkel schneidet
+Wähle unter allen nicht besuchten Knoten denjenigen Knoten \textit{v}, der die geringste Entfernung zu \textit{v}\textsubscript{0}
+hat und gleichzeitig dessen Kante zu \textit{v}\textsubscript{0} \textit{e} in einem stumpfen Winkel schneidet (Winkelbedingung).
+
+Ist es nicht möglich einen solchen Knoten zu finden, muss einen Schritt zurückgegangen werden und der
+
+\subsection{TwoOpt Postoptimierung}\label{subsec:twoopt-postoptimierung}
 
 
 \section{Umsetzung}\label{sec:umsetzung}
-Hello\cite{Hierholzer}, world.
+Die Implementierung erfolgt in Java 17.
 
 
 \section{Beispiele}\label{sec:beispiele}

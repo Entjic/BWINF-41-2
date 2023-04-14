@@ -103,5 +103,10 @@ public class Graph {
         return counter;
     }
 
+    public Node findStartNode(){
+        return this.getNodes().stream().filter(node -> node.id() == 0).findAny().orElseThrow();
+
+    }
+
 
 }

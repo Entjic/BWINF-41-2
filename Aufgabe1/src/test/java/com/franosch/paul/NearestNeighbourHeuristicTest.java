@@ -1,5 +1,6 @@
 package com.franosch.paul;
 
+import com.franosch.paul.eval.AngleCriteriaAsserter;
 import com.franosch.paul.model.Graph;
 import com.franosch.paul.model.Node;
 import com.franosch.paul.solver.nearest_neighbour.NearestNeighbourHeuristic;

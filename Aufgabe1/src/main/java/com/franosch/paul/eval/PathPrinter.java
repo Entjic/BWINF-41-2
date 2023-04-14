@@ -6,18 +6,20 @@ import java.util.List;
 
 public class PathPrinter {
 
-    public void print(List<Node> path) {
-
+    public String generatePathString(List<Node> path){
         StringBuilder stringBuilder = new StringBuilder("Path ");
 
         for (final Node node : path) {
             stringBuilder.append(node.id()).append("-");
         }
-
-        System.out.println(stringBuilder.substring(0, stringBuilder.length() - 2));
+        return stringBuilder.substring(0, stringBuilder.length() - 2);
     }
 
-    public void printPoints(List<Node> path) {
+    public void print(List<Node> path) {
+        System.out.println(this.generatePathString(path));
+    }
+
+    public String generatePointsString(List<Node> path){
         StringBuilder stringBuilder = new StringBuilder("Path ").append("\n");
         for (int i = 0; i < path.size() - 1; i++) {
             Node from = path.get(i);
@@ -33,7 +35,12 @@ public class PathPrinter {
                     .append("\n");
         }
 
-        System.out.println(stringBuilder);
+        return stringBuilder.toString();
+    }
+
+    public void printPoints(List<Node> path) {
+        String string = this.generatePointsString(path);
+        System.out.println(string);
     }
 
 }

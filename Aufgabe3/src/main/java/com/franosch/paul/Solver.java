@@ -48,9 +48,10 @@ public class Solver {
 
         System.out.println("Timings report");
         System.out.println("Time spend finding PWUE nr " + (postGen - preGen) + " ms");
-
+        pancakeSorter.printStats();
         return highestOperations;
     }
+
 
     public void solveFile(int number, boolean useTestResources) {
         PancakeFlipper pancakeFlipper = new PancakeFlipper();

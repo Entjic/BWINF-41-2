@@ -7,7 +7,7 @@ import java.util.Arrays;
 
 @Getter
 @AllArgsConstructor
-public class PancakeStackData implements Cloneable {
+public class PancakeStackData implements Cloneable, Comparable<PancakeStackData> {
     private Byte[] pancakes; // bottom to top
 
     @Override
@@ -32,5 +32,10 @@ public class PancakeStackData implements Cloneable {
     @Override
     protected PancakeStackData clone() {
         return new PancakeStackData(Arrays.copyOf(this.getPancakes(), this.getPancakes().length));
+    }
+
+    @Override
+    public int compareTo(final PancakeStackData o) {
+        return 0;
     }
 }

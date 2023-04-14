@@ -2,6 +2,7 @@ package com.franosch.paul.solver.post_optimization;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.franosch.paul.eval.PathPrinter;
 import com.franosch.paul.eval.SolutionEvaluator;
 import com.franosch.paul.model.Graph;
 import com.franosch.paul.model.Node;
@@ -24,7 +25,9 @@ public class ParameterTestSuit {
 
         SolutionEvaluator solutionEvaluator = new SolutionEvaluator();
         System.out.println("naiv solution " + solutionEvaluator.evaluate(graph, path));
-
+        PathPrinter pathPrinter = new PathPrinter();
+        pathPrinter.print(path);
+        pathPrinter.printPoints(path);
         Set<ParameterConfiguration> parameterConfigurations = this.generateAllParameterConfigurations();
 
         final int iterations = 5;
@@ -53,22 +56,24 @@ public class ParameterTestSuit {
         final Map<ParameterConfiguration, ParameterTestResult> results = Flux.fromIterable(parameterConfigurations)
                 .parallel()
                 .flatMap(parameterConfiguration -> Mono.fromCallable(() -> {
-                    System.out.println("now testing " + parameterConfiguration);
+                    // System.out.println("now testing " + parameterConfiguration);
                     ParameterTestResult result = test(parameterConfiguration, solutionEvaluator, graph, path, iterations, timeLimit);
-                    System.out.println("finished testing " + parameterConfiguration);
+                    // System.out.println("finished testing " + parameterConfiguration);
                     return Tuples.of(parameterConfiguration, result);
                 }).subscribeOn(Schedulers.parallel()))
                 .sequential()
                 .collectMap(Tuple2::getT1, Tuple2::getT2)
                 .block();
 
-        this.saveBestResults(results);
+        String date = Instant.now().toString();
+
+        this.saveBestResults(results, graph, date);
 
         return this.findBestByAverage(results, 1).stream().findAny().map(Map.Entry::getKey).orElseThrow();
     }
 
     @SneakyThrows
-    private void saveBestResults(Map<ParameterConfiguration, ParameterTestResult> map) {
+    private void saveBestResults(Map<ParameterConfiguration, ParameterTestResult> map, Graph graph, String date) {
 
         int amount = map.size() > 3 ? 3 : 1;
 
@@ -90,22 +95,44 @@ public class ParameterTestSuit {
             System.out.println("BEST BY LOWEST MAX " + byLowestMax.getKey().toString() + " -> " + byLowestMax.getValue().max());
         }
 
-        new File(new File("").getAbsoluteFile() + "/tmp/").mkdirs();
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectWriter objectWriter = objectMapper.writerWithDefaultPrettyPrinter();
-        File resultsFile = new File(new File("").getAbsolutePath() + "/tmp/results.json");
+
+        File bestByAverageFile = this.createFile("bestByAverage", date);
+        File bestByMinFile = this.createFile("bestByMin", date);
+        File bestByLowestMaxFile = this.createFile("bestByLowestMax", date);
+        File bestByMinPathFile = this.createFile("bestByMinPath", date);
+        File resultsFile = this.createFile("results", date);
         objectWriter.writeValue(resultsFile, map);
-        File bestByAverageFile = this.createFile("bestByAverage");
-        File bestByMinFile = this.createFile("bestByMin");
-        File bestByLowestMaxFile = this.createFile("bestByLowestMax");
         objectWriter.writeValue(bestByAverageFile, bestByAverage);
         objectWriter.writeValue(bestByMinFile, bestByMin);
+        writeBestSolutionToFile(map, graph, objectWriter, bestByMinPathFile);
         objectWriter.writeValue(bestByLowestMaxFile, bestByLowestMax);
 
     }
 
-    private File createFile(String name) {
-        String date = Instant.now().toString();
+    @SneakyThrows
+    private void writeBestSolutionToFile(final Map<ParameterConfiguration, ParameterTestResult> map,
+                                         final Graph graph,
+                                         final ObjectWriter objectWriter,
+                                         final File bestByMinPathFile) {
+        PathPrinter pathPrinter = new PathPrinter();
+        SolutionEvaluator solutionEvaluator = new SolutionEvaluator();
+
+
+        List<Node> path = this.findBestByMin(map, 1).stream().map(parameterConfigurationParameterTestResultEntry ->
+                        parameterConfigurationParameterTestResultEntry.getValue().routes())
+                .flatMap(Set::stream)
+                .max(Comparator.comparingDouble(value ->
+                        solutionEvaluator.evaluate(graph, value)))
+                .orElseThrow();
+
+
+        objectWriter.writeValue(bestByMinPathFile, pathPrinter.generatePathString(path) + "\n\n"
+                + pathPrinter.generatePointsString(path));
+    }
+
+    private File createFile(String name, String date) {
 
         String directory = new File("").getAbsolutePath() + "/tmp" + date + "/";
 
@@ -119,10 +146,10 @@ public class ParameterTestSuit {
 
         Set<ParameterConfiguration> set = new HashSet<>();
 
-        for (double temperatur = 800.0; temperatur <= 1500.0; temperatur += 50) { // 20
-            for (double temperaturModifier = 0.980; temperaturModifier < 1; temperaturModifier += 0.005) { // 2
-                for (int successfulCoolingPeriod = 1; successfulCoolingPeriod <= 20; successfulCoolingPeriod += 2) { // 2
-                    for (int coolingPeriod = successfulCoolingPeriod; coolingPeriod <= 20; coolingPeriod += 2) { // 2
+        for (double temperatur = 100; temperatur <= 800; temperatur += 50) { // 14
+            for (double temperaturModifier = 0.9; temperaturModifier <= 0.95; temperaturModifier += 0.005) { // 10
+                for (int successfulCoolingPeriod = 5; successfulCoolingPeriod <= 15; successfulCoolingPeriod += 5) { // 3
+                    for (int coolingPeriod = successfulCoolingPeriod; coolingPeriod <= 20; coolingPeriod += 5) { // 2
                         ParameterConfiguration parameterConfiguration = new ParameterConfiguration(temperatur,
                                 temperaturModifier, successfulCoolingPeriod, coolingPeriod);
 
@@ -142,8 +169,11 @@ public class ParameterTestSuit {
             throw new IllegalArgumentException();
         }
         Set<Double> doubles = new HashSet<>();
+        Set<List<Node>> routes = new HashSet<>();
         for (int i = 0; i < iterations; i++) {
-            doubles.add(this.test(parameterConfiguration, solutionEvaluator, graph, path, timeLimit));
+            List<Node> testResult = this.test(parameterConfiguration, solutionEvaluator, graph, path, timeLimit);
+            doubles.add(solutionEvaluator.evaluate(graph, testResult));
+            routes.add(testResult);
         }
         // System.out.println(doubles);
         double min = doubles.stream().min(Double::compareTo).orElseThrow();
@@ -153,17 +183,14 @@ public class ParameterTestSuit {
         double average = doubles.stream().mapToDouble(Number::doubleValue).average().orElseThrow();
         // System.out.println("average " + average);
 
-        return new ParameterTestResult(min, max, average);
+        return new ParameterTestResult(min, max, average, routes);
     }
 
-    private double test(ParameterConfiguration parameterConfiguration, SolutionEvaluator solutionEvaluator,
-                        Graph graph, List<Node> path, long timeLimit) {
+    private List<Node> test(ParameterConfiguration parameterConfiguration, SolutionEvaluator solutionEvaluator,
+                            Graph graph, List<Node> path, long timeLimit) {
 
         TwoOptPostOptimization twoOptPostOptimization = new TwoOptPostOptimization(solutionEvaluator, parameterConfiguration);
-        final List<Node> optimize = twoOptPostOptimization.optimize(graph, path, timeLimit);
-
-
-        return solutionEvaluator.evaluate(graph, optimize);
+        return twoOptPostOptimization.optimize(graph, path, timeLimit);
     }
 
     private Set<Map.Entry<ParameterConfiguration, ParameterTestResult>> findBestByAverage(Map<ParameterConfiguration, ParameterTestResult> input, int amount) {
@@ -190,7 +217,7 @@ public class ParameterTestSuit {
     }
 
 
-    public record ParameterTestResult(double min, double max, double average) {
+    public record ParameterTestResult(double min, double max, double average, Set<List<Node>> routes) {
     }
 
 

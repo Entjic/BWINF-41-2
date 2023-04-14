@@ -1,11 +1,15 @@
 package com.franosch.paul;
 
+import com.franosch.paul.eval.AngleCriteriaAsserter;
 import com.franosch.paul.eval.SolutionEvaluator;
 import com.franosch.paul.model.Graph;
 import com.franosch.paul.model.Node;
+import com.franosch.paul.solver.SolvingStrategy;
 import com.franosch.paul.solver.nearest_neighbour.NearestNeighbourHeuristic;
 import com.franosch.paul.solver.nearest_neighbour.next_edge.AngleCriteriaNextEdgeProvider;
 import com.franosch.paul.solver.nearest_neighbour.next_edge.WeightedNextEdgeProvider;
+import com.franosch.paul.solver.post_optimization.ParameterConfiguration;
+import com.franosch.paul.solver.post_optimization.ParameterTestSuit;
 import com.franosch.paul.solver.post_optimization.TwoOptPostOptimization;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -65,6 +69,43 @@ public class TwoOptPostOptimizationTest {
         Assertions.assertTrue(angleCriteriaAsserter.fulfillsAngleCriteria(graph, optimized));
 
     }
+
+    @Test
+    public void allStartingNodesNearestNeighbourHeuristicIsAlwaysBetterThanJustNearestNeighbourHeuristicTest(){
+        TravelingSalesmanSolver solver = new TravelingSalesmanSolver();
+        int[] testCasesThatAreSolvable = new int[]{1,2,3,4,6,7};
+
+        for (final int testCase : testCasesThatAreSolvable) {
+            System.out.println("test case " + testCase);
+            double solvedByNearestNeighbourHeuristic = solver.solve(testCase, true,
+                    SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+            double solvedByAllStartingNodesNearestNeighbourHeuristic = solver.solve(testCase, true,
+                    SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
+            Assertions.assertTrue(solvedByAllStartingNodesNearestNeighbourHeuristic <= solvedByNearestNeighbourHeuristic);
+        }
+
+    }
+
+
+    @Test
+    public void findGoodParameter() {
+        ParameterTestSuit parameterTestSuit = new ParameterTestSuit();
+        GraphGenerator graphGenerator = new GraphGenerator(6, true);
+        final Graph graph = graphGenerator.generateGraph();
+        final Node startNode = graphGenerator.findStartNode(graph);
+        NearestNeighbourHeuristic nearestNeighbourHeuristic = new NearestNeighbourHeuristic(
+                new WeightedNextEdgeProvider(
+                        new AngleCriteriaNextEdgeProvider()
+                )
+        );
+        final List<Node> solve = nearestNeighbourHeuristic.solve(graph, startNode);
+        final ParameterConfiguration goodParameter =
+                parameterTestSuit.findGoodParameter(graph, solve);
+
+        System.out.println("best config " + goodParameter);
+    }
+
+
 
 
 

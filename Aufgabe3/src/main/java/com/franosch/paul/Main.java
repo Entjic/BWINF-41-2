@@ -15,8 +15,8 @@ public class Main {
             System.exit(0);
         }
         int mode = Integer.parseInt(modeInput);
-        Solver solver = new Solver();
         while (true) {
+            Solver solver = new Solver();
             switch (mode) {
                 case 1 -> {
                     System.out.println("Du befindest dich nun im Pfannkuchenstapellöser Modus.");

@@ -1,18 +1,10 @@
 package com.franosch.paul;
 
 import com.franosch.paul.model.Graph;
-import com.franosch.paul.model.Node;
-import com.franosch.paul.solver.nearest_neighbour.NearestNeighbourHeuristic;
 import com.franosch.paul.solver.SolvingStrategy;
-import com.franosch.paul.solver.nearest_neighbour.next_edge.AngleCriteriaNextEdgeProvider;
-import com.franosch.paul.solver.nearest_neighbour.next_edge.WeightedNextEdgeProvider;
 import com.franosch.paul.solver.post_optimization.ParameterConfiguration;
-import com.franosch.paul.solver.post_optimization.ParameterTestSuit;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import java.util.List;
 
 public class SolverTest {
 
@@ -48,15 +40,15 @@ public class SolverTest {
     }
 
     @Test
-    public void solveFifthByShortestEdgeFirst() { // TODO: 29.03.2023 prove this is not solvable
+    public void solveFifthByShortestEdgeFirst() {
         solver.solve(5, true, SolvingStrategy.TRAVERSABLE_ORIENTED_WEIGHTED_NEAREST_NEIGHBOUR_HEURISTIC);
-        // https://paste.myplayplanet.tools/aqigunotub.css
+        // https://paste.myplayplanet.tools/vodemexuca.css
     }
 
     @Test
     public void solveSixthByShortestEdgeFirst() {
         solver.solve(6, true, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
-        // https://paste.myplayplanet.tools/joxezedezo.css
+        // https://paste.myplayplanet.tools/lowofozese.css
     }
 
     @Test
@@ -66,38 +58,39 @@ public class SolverTest {
     }
 
     @Test
-    public void allStartingNodesNearestNeighbourHeuristicIsAlwaysBetterThanJustNearestNeighbourHeuristicTest(){
+    public void solveFifthWithGoodParams() {
+        Graph graph = solver.generateGraphFromFile(5, true);
+        solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.TRAVERSABLE_ORIENTED_WEIGHTED_NEAREST_NEIGHBOUR_HEURISTIC,
+                new ParameterConfiguration(1300.0, 0.985, 10, 16));
+        /*
 
-        int[] testCasesThatAreSolvable = new int[]{1,2,3,4,6,7};
+        // https://paste.myplayplanet.tools/ulehitejev.css new ParameterConfiguration(1400.0, 0.9, 11, 16)
+        // https://paste.myplayplanet.tools/ajalowodec.css new ParameterConfiguration(1400.0, 0.9, 11, 16)
 
-        for (final int testCase : testCasesThatAreSolvable) {
-            System.out.println("test case " + testCase);
-            double solvedByNearestNeighbourHeuristic = solver.solve(testCase, true,
-                    SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
-            double solvedByAllStartingNodesNearestNeighbourHeuristic = solver.solve(testCase, true,
-                    SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
-            Assertions.assertTrue(solvedByAllStartingNodesNearestNeighbourHeuristic <= solvedByNearestNeighbourHeuristic);
-        }
+        // https://paste.myplayplanet.tools/egasiqejoz.css new ParameterConfiguration(1500.0, 0.97, 16, 16));
+
+        BEST BY MIN ParameterConfiguration[startingTemperature=500.0, temperaturModifier=0.99, improvingIterationsUntilCooling=16, iterationsUntilCooling=16] -> 3381.157719454162
+        BEST BY MIN ParameterConfiguration[startingTemperature=1300.0, temperaturModifier=0.985, improvingIterationsUntilCooling=10, iterationsUntilCooling=16] -> 3381.157719454162
+        BEST BY MIN ParameterConfiguration[startingTemperature=700.0, temperaturModifier=0.985, improvingIterationsUntilCooling=10, iterationsUntilCooling=16] -> 3381.157719454162
+        // https://paste.myplayplanet.tools/nibehaqidi.css best ParameterConfiguration[startingTemperature=1300.0, temperaturModifier=0.985, improvingIterationsUntilCooling=10, iterationsUntilCooling=16]
+
+         */
+    }
+
+    @Test
+    public void solveSixthWithGoodParams(){
+        Graph graph = solver.generateGraphFromFile(6, true);
+        solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.TRAVERSABLE_ORIENTED_WEIGHTED_NEAREST_NEIGHBOUR_HEURISTIC,
+                new ParameterConfiguration(1500.0, 0.97, 16, 16));
 
     }
 
-
     @Test
-    public void findGoodParameter() {
-        ParameterTestSuit parameterTestSuit = new ParameterTestSuit();
-        GraphGenerator graphGenerator = new GraphGenerator(6, true);
-        final Graph graph = graphGenerator.generateGraph();
-        final Node startNode = graphGenerator.findStartNode(graph);
-        NearestNeighbourHeuristic nearestNeighbourHeuristic = new NearestNeighbourHeuristic(
-                new WeightedNextEdgeProvider(
-                        new AngleCriteriaNextEdgeProvider()
-                )
-        );
-        final List<Node> solve = nearestNeighbourHeuristic.solve(graph, startNode);
-        final ParameterConfiguration goodParameter =
-                parameterTestSuit.findGoodParameter(graph, solve);
+    public void solveSeventhWithGoodParams(){
+        Graph graph = solver.generateGraphFromFile(7, true);
+        solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC,
+                new ParameterConfiguration(1450.0, 0.975, 10, 19));
 
-        System.out.println("best config " + goodParameter);
     }
 
 

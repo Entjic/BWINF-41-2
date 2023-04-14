@@ -86,24 +86,25 @@ public class TwoOptPostOptimization implements PostOptimization {
     private ResultType improve(Graph graph, List<Node> current, long timeLimit) {
         while (System.currentTimeMillis() < timeLimit) {
 
-            int first = this.randomInRange(1, current.size() - 5);
-            int second = this.randomInRange(first + 3, current.size() - 3);
-            Node prevFirstNode = current.get(first - 1);
+            int first = this.randomInRange(0, current.size() - 4);
+            int second = this.randomInRange(first + 2, current.size() - 1);
+
+            Node prevFirstNode = first == 0 ? null : current.get(first - 1);
             Node firstNode = current.get(first);
             Node postFirstNode = current.get(first + 1);
             Node postPostFirstNode = current.get(first + 2);
 
             Node prevSecondNode = current.get(second - 1);
             Node secondNode = current.get(second);
-            Node postSecondNode = current.get(second + 1);
-            Node postPostSecondNode = current.get(second + 2);
+            Node postSecondNode = second == current.size() - 1 ? null : current.get(second + 1);
+            Node postPostSecondNode = second >= current.size() - 2 ? null : current.get(second + 2);
 
-            Edge a = graph.getEdge(prevFirstNode, firstNode);
+            Edge a = prevFirstNode == null ? null : graph.getEdge(prevFirstNode, firstNode);
             Edge insertedEdgeOne = graph.getEdge(firstNode, secondNode);
-            Edge insertedEdgeTwo = graph.getEdge(postFirstNode, postSecondNode);
+            Edge insertedEdgeTwo = postSecondNode == null ? null : graph.getEdge(postFirstNode, postSecondNode);
             Edge d = graph.getEdge(prevSecondNode, secondNode);
             Edge e = graph.getEdge(postFirstNode, postPostFirstNode);
-            Edge f = graph.getEdge(postSecondNode, postPostSecondNode);
+            Edge f = postPostSecondNode == null ? null : graph.getEdge(postSecondNode, postPostSecondNode);
 
             if (doesNotMatchAngleCriteria(a, insertedEdgeOne)) {
                 continue;
@@ -124,7 +125,7 @@ public class TwoOptPostOptimization implements PostOptimization {
             Edge b = graph.getEdge(secondNode, postSecondNode);
             Edge c = graph.getEdge(firstNode, postFirstNode);
 
-            double difference = - c.weight() - b.weight() + insertedEdgeOne.weight() + insertedEdgeTwo.weight();
+            double difference = -c.weight() - b.weight() + insertedEdgeOne.weight() + insertedEdgeTwo.weight();
 
             if (difference < 0) {
                 twoOptSwap(current, first, second);
@@ -160,17 +161,20 @@ public class TwoOptPostOptimization implements PostOptimization {
     }
 
     private boolean doesNotMatchAngleCriteria(Edge a, Edge b) {
+        if (a == null || b == null) {
+            return false;
+        }
         if (a.from().equals(b.from())) {
-            return ! VectorCalculator.matchesAngleCriteria(a.vector(a.from()), b.vector(a.from()));
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.from()), b.vector(a.from()));
         }
         if (a.to().equals(b.to())) {
-            return ! VectorCalculator.matchesAngleCriteria(a.vector(a.to()), b.vector(a.to()));
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.to()), b.vector(a.to()));
         }
         if (a.to().equals(b.from())) {
-            return ! VectorCalculator.matchesAngleCriteria(a.vector(a.to()), b.vector(a.to()));
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.to()), b.vector(a.to()));
         }
         if (a.from().equals(b.to())) {
-            return ! VectorCalculator.matchesAngleCriteria(a.vector(a.from()), b.vector(a.from()));
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.from()), b.vector(a.from()));
         }
         throw new IllegalArgumentException();
     }
@@ -183,7 +187,7 @@ public class TwoOptPostOptimization implements PostOptimization {
      */
     private boolean allowWorseningSwap(double difference) {
         double random = Math.random();
-        double exp = Math.exp((- difference) / temperatur);
+        double exp = Math.exp((-difference) / temperatur);
 
         return exp > random;
     }

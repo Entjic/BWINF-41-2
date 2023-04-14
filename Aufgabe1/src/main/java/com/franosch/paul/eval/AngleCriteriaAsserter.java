@@ -1,4 +1,4 @@
-package com.franosch.paul;
+package com.franosch.paul.eval;
 
 import com.franosch.paul.model.Edge;
 import com.franosch.paul.model.Graph;

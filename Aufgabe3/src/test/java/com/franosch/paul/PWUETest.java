@@ -61,6 +61,25 @@ public class PWUETest {
     }
 
     @Test
+    public void calcPWUEForNine(){
+        int pwue = solver.findPWUE(9);
+        Assertions.assertEquals(5, pwue);
+    }
+
+    @Test
+    public void calcPWUEForTen(){
+        int pwue = solver.findPWUE(10);
+        Assertions.assertEquals(6, pwue);
+    }
+
+    @Test
+    public void calcPWUEForEleven(){
+        int pwue = solver.findPWUE(11);
+        Assertions.assertEquals(6, pwue);
+    }
+
+
+    @Test
     public void calcPWUE() {
         solver.findPWUE(11);
         /*
