@@ -37,10 +37,90 @@ Die Implementierung erfolgt in Java 17.
 
 
 \section{Beispiele}\label{sec:beispiele}
-Genügend Beispiele einbinden!
-Die Beispiele von der BwInf-Webseite sollten hier diskutiert werden, aber auch eigene Beispiele sind
-sehr gut – besonders wenn sie Spezialfälle abdecken.
-Aber bitte nicht 30 Seiten Programmausgabe hier einfügen!
+
+\subsection{Beispiel 1}\label{subsec:beispiel-1}
+
+\subsection{Beispiel 2}\label{subsec:beispiel-2}
+
+\subsection{Beispiel 3}\label{subsec:beispiel-3}
+
+\subsection{Beispiel 4}\label{subsec:beispiel-4}
+
+\subsection{Beispiel 5}\label{subsec:beispiel-5}
+Zunächst wurde versucht mittels Nearest-Neighbour Heuristik eine initiale Lösung zu finden.
+Dies führte auch nach über einer Stunde Laufzeit nicht zu einem Ergebnis.
+Aufgrund dessen wurde die Nearest-Neighbour Heuristik derart modifiziert, dass nicht nur
+der Abstand eines Knotens zum aktuellen Knoten in betracht gezogen wird, sondern auch
+die überhaupt möglichen Pfade die über den Knoten führen.
+Je weniger solcher Pfade es gab, desto höher Priorität hat der Knoten in der Suche des nächsten Knotens.
+Dieses Vorgehen erklärt die vergleichsweise schlechte initiale Lösung.
+Um so interessanter ist es, dass die Postoptimierung dennoch zu so einem guten Ergebnis führt. \\
+
+\begin{figure}[!tbp]
+    \centering
+    \begin{minipage}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{naivwenigerkrumm5}
+        \caption{Naive Lösung Länge 9277.77985102936}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{optimizedwenigerkrumm5}
+        \caption{Optimierte Lösung Länge 3381.157719454162}
+    \end{minipage}\label{fig:wenigerkrumm5}
+\end{figure}
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        Parameter          & Wert  \\ \hline
+        Starttemperatur    & 1300  \\ \hline
+        Temperaturänderung & 0,985 \\ \hline
+        \begin{tabular}[c]{@{}l@{}}
+            Verbessernde Iterationen\\ bis zur Abkühlung
+        \end{tabular}      & 10    \\ \hline
+        \begin{tabular}[c]{@{}l@{}}
+            Iterationen bis \\ zur Abkühlung
+        \end{tabular}      & 16    \\ \hline
+    \end{tabular}
+    \caption{Parameterkonfiguration Beispiel 5}
+    \label{tab:wenigerkrumm5}
+\end{table}
+
+\subsection{Beispiel 6}\label{subsec:beispiel-6}
+
+\subsection{Beispiel 7}\label{subsec:beispiel-7}
+
+\begin{figure}[!tbp]
+    \centering
+    \begin{minipage}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{naivwenigerkrumm7}
+        \caption{Naive Lösung Länge 6218.113121079488}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.4\textwidth}
+        \includegraphics[width=\textwidth]{optimizedwenigerkrumm7}
+        \caption{Optimierte Lösung Länge 4451.743885428826}
+    \end{minipage}\label{fig:wenigerkrumm7}
+\end{figure}
+
+\begin{table}[]
+    \centering
+    \begin{tabular}{|l|l|}
+        \hline
+        Parameter          & Wert  \\ \hline
+        Starttemperatur    & 1450  \\ \hline
+        Temperaturänderung & 0,975 \\ \hline
+        \begin{tabular}[c]{@{}l@{}}
+            Verbessernde Iterationen\\ bis zur Abkühlung
+        \end{tabular} & 10 \\ \hline
+        \begin{tabular}[c]{@{}l@{}}
+            Iterationen bis \\ zur Abkühlung
+        \end{tabular} & 19 \\ \hline
+    \end{tabular}
+    \caption{Parameterkonfiguration Beispiel 7}
+    \label{tab:wenigerkrumm7}
+\end{table}
 
 
 \section{Quellcode}\label{sec:quellcode}

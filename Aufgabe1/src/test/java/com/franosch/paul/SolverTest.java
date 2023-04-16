@@ -53,7 +53,7 @@ public class SolverTest {
 
     @Test
     public void solveSeventhByShortestEdgeFirst() {
-        solver.solve(7, true, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
+        solver.solve(7, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
         // https://paste.myplayplanet.tools/iyufokufak.css
     }
 
@@ -89,7 +89,9 @@ public class SolverTest {
     public void solveSeventhWithGoodParams(){
         Graph graph = solver.generateGraphFromFile(7, true);
         solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC,
-                new ParameterConfiguration(1450.0, 0.975, 10, 19));
+                //new ParameterConfiguration(1450.0, 0.975, 10, 19)
+                new ParameterConfiguration(500, 0.97, 20, 50)
+        );
 
     }
 

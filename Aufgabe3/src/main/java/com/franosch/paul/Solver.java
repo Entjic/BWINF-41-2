@@ -7,6 +7,9 @@ import com.franosch.paul.model.PancakeStackSortingResult;
 import lombok.RequiredArgsConstructor;
 
 import java.util.*;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @RequiredArgsConstructor
 public class Solver {
@@ -19,9 +22,11 @@ public class Solver {
         PancakeStackGenerator pancakeStackGenerator = new PancakeStackGenerator();
         System.out.println("generating and solving pancake stacks");
         long preGen = System.currentTimeMillis();
+
+
         Set<PancakeStackSortingResult> sorted = pancakeStackGenerator
                 .generateAllOfHeightAndApply(number,
-                        pancakeSorter::sort);
+                        pancakeSorter::sort, true);
         long postGen = System.currentTimeMillis();
         int highestOperations = sorted
                 .stream()

@@ -6,16 +6,18 @@ import com.franosch.paul.model.PancakeStackData;
 import com.franosch.paul.model.PancakeStackSortingResult;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class PancakeStackSorter {
     private final PancakeFlipper pancakeFlipper;
     private final PancakeFlippingOrderApplier pancakeFlippingOrderApplier;
 
-    private final Map<PancakeStackData, FlippingOrder> flippingOrderMap = new HashMap<>();
+    private final Map<PancakeStackData, FlippingOrder> flippingOrderMap = new ConcurrentHashMap<>();
     private final Map<Integer, Long> factorial = new HashMap<>();
 
     private final static int PURGE_MAP_CYCLE = 100000;
-    private int counter = 0;
+    private AtomicInteger counter = new AtomicInteger(0);
 
     public PancakeStackSorter(final PancakeFlipper pancakeFlipper, final PancakeFlippingOrderApplier pancakeFlippingOrderApplier) {
         this.pancakeFlipper = pancakeFlipper;
@@ -36,16 +38,18 @@ public class PancakeStackSorter {
         FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
         PancakeStack solved = this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
         // System.out.println(getMapEntryCount());
-        if (counter++ == PURGE_MAP_CYCLE) {
+        if (counter.getAndIncrement() == PURGE_MAP_CYCLE) {
             clearLowerLevelsOfMap(pancakeStack.getPancakes().getPancakes().length);
-            counter = 0;
+            counter.set(0);
         }
         return PancakeStackSortingResult.of(flippingOrder, solved, pancakeStack);
     }
 
     public void clearLowerLevelsOfMap(int length) {
         List<Integer> lengthsToRemove = new ArrayList<>();
-        for (final Map.Entry<Integer, Integer> entry : this.countPancakeStackEntriesByLength().entrySet()) {
+        Map<Integer, Integer> count = this.countPancakeStackEntriesByLength();
+        System.out.println(count);
+        for (final Map.Entry<Integer, Integer> entry : count.entrySet()) {
             Integer key = entry.getKey();
             if (key == length) continue;
             if (entry.getValue() == calcNumberOfDifferentPancakeStacks(key)) {

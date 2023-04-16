@@ -2,23 +2,34 @@ package com.franosch.paul;
 
 import com.franosch.paul.model.PancakeStack;
 import com.franosch.paul.model.PancakeStackSortingResult;
+import lombok.Getter;
+import lombok.SneakyThrows;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentSkipListSet;
+import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 
 public class PancakeStackGenerator {
 
-    private int currentWorstCase;
+    private AtomicInteger currentWorstCase;
+    private final Set<CompletableFuture<Void>> allFutures = ConcurrentHashMap.newKeySet();
 
+    @SneakyThrows
     public Set<PancakeStackSortingResult> generateAllOfHeightAndApply(int height,
-                                                                      Function<PancakeStack, PancakeStackSortingResult> sort) {
-        this.currentWorstCase = 0;
+                                                                      Function<PancakeStack, PancakeStackSortingResult> sort,
+                                                                      boolean useMultiThreading) {
+        this.currentWorstCase = new AtomicInteger(0);
         List<Byte> pancakes = this.generatePancakeListOfHeight(height);
-        Set<PancakeStackSortingResult> results = new HashSet<>();
-        this.permuteAndApply(pancakes, 0, sort, results);
+        Set<PancakeStackSortingResult> results = ConcurrentHashMap.newKeySet();
+        this.permuteAndApply(pancakes, 0, sort, results, useMultiThreading);
+        System.out.println("futures " + allFutures.size());
+        CompletableFuture<Void> completableFuture = CompletableFuture.allOf(allFutures.toArray(CompletableFuture[]::new));
+        completableFuture.join();
+        System.out.println("futures done");
         return results;
     }
 
@@ -40,26 +51,39 @@ public class PancakeStackGenerator {
 
     private void permuteAndApply(List<Byte> pancakes, int height,
                                  Function<PancakeStack, PancakeStackSortingResult> sort,
-                                 Set<PancakeStackSortingResult> results) {
+                                 Set<PancakeStackSortingResult> results, boolean useAsync) {
         for (int i = height; i < pancakes.size(); i++) {
-            java.util.Collections.swap(pancakes, i, height);
-            permuteAndApply(pancakes, height + 1, sort, results);
-            java.util.Collections.swap(pancakes, height, i);
+            Collections.swap(pancakes, i, height);
+            permuteAndApply(pancakes, height + 1, sort, results, useAsync);
+            Collections.swap(pancakes, height, i);
         }
         if (height == pancakes.size() - 1) {
-            PancakeStackSortingResult pancakeStackSortingResult =
-                    sort.apply(new PancakeStack(pancakes.toArray(new Byte[0])));
-            int size = pancakeStackSortingResult.getFlippingOrder().getFlippingOperations().size();
-            if (size < currentWorstCase) {
+            PancakeStack pancakeStack = new PancakeStack(pancakes.toArray(new Byte[0]));
+            if (useAsync) {
+                CompletableFuture<Void> completableFuture = CompletableFuture.runAsync(() -> addToResult(pancakeStack, sort, results));
+                allFutures.add(completableFuture);
                 return;
             }
-            if (size > currentWorstCase) {
-                this.currentWorstCase = size;
-                results.clear();
-                results.add(pancakeStackSortingResult); // just for testing purpose
-            }
-            // results.add(pancakeStackSortingResult);
+            addToResult(pancakeStack, sort, results);
         }
+    }
+
+    private void addToResult(final PancakeStack pancakeStack,
+                             final Function<PancakeStack, PancakeStackSortingResult> sort,
+                             final Set<PancakeStackSortingResult> results) {
+        PancakeStackSortingResult pancakeStackSortingResult = sort.apply(pancakeStack);
+        int size = pancakeStackSortingResult.getFlippingOrder().getFlippingOperations().size();
+        int currentMax = currentWorstCase.get();
+        while (size > currentMax) {
+            if (currentWorstCase.compareAndSet(currentMax, size)) {
+                results.clear();
+                results.add(pancakeStackSortingResult);
+                System.out.println("new biggest int is " + size);
+                break;
+            }
+            currentMax = currentWorstCase.get();
+        }
+        // results.add(pancakeStackSortingResult);
     }
 
     private void permute(List<Byte> pancakes, int height, Set<PancakeStack> results) {
