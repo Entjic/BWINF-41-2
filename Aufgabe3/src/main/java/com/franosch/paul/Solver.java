@@ -14,11 +14,7 @@ import java.util.concurrent.Executors;
 @RequiredArgsConstructor
 public class Solver {
 
-    public int findPWUE(int height) {
-        return this.findPWUE(height, 1);
-    }
-
-    public int findPWUE(int height, int amountOfWorseCaseStacks){
+    public int findPWUE(int number) {
         PancakeFlipper pancakeFlipper = new PancakeFlipper();
         PancakeFlippingOrderApplier pancakeFlippingOrderApplier = new PancakeFlippingOrderApplier(pancakeFlipper);
         PancakeStackSorter pancakeSorter = new PancakeStackSorter(pancakeFlipper, pancakeFlippingOrderApplier);
@@ -27,17 +23,13 @@ public class Solver {
         long preGen = System.currentTimeMillis();
         PWUENumberCalculator pwueNumberCalculator = new PWUENumberCalculator(pancakeSorter, pancakeFlipper);
 
-        Set<PancakeStackSortingResult> result = Set.of(pwueNumberCalculator.calcPWUE(height));
+        PancakeStackSortingResult result = pwueNumberCalculator.calcPWUE(number);
         long postGen = System.currentTimeMillis();
-        int pwue = result.stream().findAny().orElseThrow().getFlippingOrder().getFlippingOperations().size();
-        System.out.println("PWUE of number " + height + " is " + pwue);
-
-        for (final PancakeStackSortingResult pancakeStackSortingResult : result) {
-            System.out.println("Example worst case pancake stack " + pancakeStackSortingResult.getPrevious());
-            System.out.println("Solved " + pancakeStackSortingResult.getSolved());
-            System.out.println("Flippings operations to solve pancake stack " + pancakeStackSortingResult.getFlippingOrder());
-        }
-
+        int pwue = result.getFlippingOrder().getFlippingOperations().size();
+        System.out.println("PWUE of number " + number + " is " + pwue);
+        System.out.println("Example worst case pancake stack " + result.getPrevious());
+        System.out.println("Solved " + result.getSolved());
+        System.out.println("Flippings operations to solve pancake stack " + result.getFlippingOrder());
         System.out.println("Sorter map contains " + pancakeSorter.getMapEntryCount() + " entries");
 
         System.out.println("Timings report");
