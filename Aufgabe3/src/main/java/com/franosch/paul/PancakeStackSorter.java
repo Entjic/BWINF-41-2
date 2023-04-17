@@ -14,18 +14,10 @@ public class PancakeStackSorter {
     private final PancakeFlippingOrderApplier pancakeFlippingOrderApplier;
 
     private final Map<PancakeStackData, FlippingOrder> flippingOrderMap = new ConcurrentHashMap<>();
-    private final Map<Integer, Long> factorial = new HashMap<>();
-
-    private final static int PURGE_MAP_CYCLE = 100000;
-    private AtomicInteger counter = new AtomicInteger(0);
 
     public PancakeStackSorter(final PancakeFlipper pancakeFlipper, final PancakeFlippingOrderApplier pancakeFlippingOrderApplier) {
         this.pancakeFlipper = pancakeFlipper;
         this.pancakeFlippingOrderApplier = pancakeFlippingOrderApplier;
-
-        for (int i = 2; i < 15; i++) {
-            factorial.put(i, this.factorial(i));
-        }
 
     }
 
@@ -38,57 +30,7 @@ public class PancakeStackSorter {
         FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
         PancakeStack solved = this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
         // System.out.println(getMapEntryCount());
-        if (counter.getAndIncrement() == PURGE_MAP_CYCLE) {
-            clearLowerLevelsOfMap(pancakeStack.getPancakes().getPancakes().length);
-            counter.set(0);
-        }
         return PancakeStackSortingResult.of(flippingOrder, solved, pancakeStack);
-    }
-
-    public void clearLowerLevelsOfMap(int length) {
-        List<Integer> lengthsToRemove = new ArrayList<>();
-        Map<Integer, Integer> count = this.countPancakeStackEntriesByLength();
-        System.out.println(count);
-        for (final Map.Entry<Integer, Integer> entry : count.entrySet()) {
-            Integer key = entry.getKey();
-            if (key == length) continue;
-            if (entry.getValue() == calcNumberOfDifferentPancakeStacks(key)) {
-                lengthsToRemove.add(key);
-            }
-        }
-        if (lengthsToRemove.size() == 0) return;
-        Integer biggest = this.max(lengthsToRemove);
-        lengthsToRemove.remove(biggest);
-        lengthsToRemove.add(length);
-        for (final PancakeStackData pancakeStackData : new HashSet<>(flippingOrderMap.keySet())) {
-            if (lengthsToRemove.contains(pancakeStackData.getPancakes().length)) {
-                flippingOrderMap.remove(pancakeStackData);
-            }
-        }
-    }
-
-    private int max(Collection<Integer> collection) {
-        int max = Integer.MIN_VALUE;
-        for (final Integer integer : collection) {
-            if (integer > max) {
-                max = integer;
-            }
-        }
-        return max;
-    }
-
-    private long calcNumberOfDifferentPancakeStacks(int size) {
-        return this.factorial.get(size) - 1;
-    }
-
-    private long factorial(int number) {
-        long result = 1;
-
-        for (int factor = 2; factor <= number; factor++) {
-            result *= factor;
-        }
-
-        return result;
     }
 
     public void printStats() {

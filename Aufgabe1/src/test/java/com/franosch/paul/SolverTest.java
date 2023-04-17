@@ -17,19 +17,19 @@ public class SolverTest {
 
     @Test
     public void solveFirstByShortestEdgeFirst() {
-        solver.solve(1, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        solver.solve(1, true, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
         // https://paste.myplayplanet.tools/qifafudoli.css
     }
 
     @Test
     public void solveSecondByShortestEdgeFirst() {
-        solver.solve(2, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        solver.solve(2, true, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
         // https://paste.myplayplanet.tools/kefegobeja.css
     }
 
     @Test
     public void solveThirdByShortestEdgeFirst() {
-        solver.solve(3, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
+        solver.solve(3, true, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC);
         // https://paste.myplayplanet.tools/xayigarati.css
     }
 
@@ -55,6 +55,16 @@ public class SolverTest {
     public void solveSeventhByShortestEdgeFirst() {
         solver.solve(7, true, SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC);
         // https://paste.myplayplanet.tools/iyufokufak.css
+    }
+
+    @Test
+    public void solveFourthWithGoodParams(){
+        Graph graph = solver.generateGraphFromFile(4, true);
+        solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.ALL_STARTING_NODES_NEAREST_NEIGHBOUR_HEURISTIC,
+                //new ParameterConfiguration(1450.0, 0.975, 10, 19)
+                new ParameterConfiguration(500, 0.95, 20, 50)
+        );
+
     }
 
     @Test

@@ -57,4 +57,9 @@ public class FileSolvingTest {
         solver.solveFile(13, true);
     }
 
+    @Test
+    public void solveCustomHard() {
+        solver.solveFile(8, true);
+    }
+
 }
