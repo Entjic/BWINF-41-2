@@ -6,36 +6,36 @@
 
 \section{Lösungsidee}\label{sec:losungsidee}
 Um Pfandkuchenstapel zu sortieren, wird die Technik des Dynamic Programmings verwendet.
-Idee ist es, das Problem, also den zu sortierenden Pfandkuchenstapel in identische Teilprobleme zu zerlegen.
+Idee ist es, das Problem, also den zu sortierenden Pfandkuchenstapel, in identische Teilprobleme zu zerlegen.
 Im Kontext der Aufgabe bedeutet das, an allen möglichen Indizes die Wende-und-Essoperation beginnen zu lassen.
 Der jeweilige Index der Wende-und-Essoperation wird gemerkt.
 Dieses Verfahren wird so lange wiederholt, bis der Pfandkuchenstapel sortiert ist.
 Die möglichen Abfolgen von Wende-und-Essoperationen zur Sortierung eines Pfandkuchenstapels werden gesammelt
 und abschlie{\ss}end derjenige gewählt, der die wenigsten Wende-und-Essoperationen benötigt.
-Danach wird sich der aktuelle Pfandkuchenstapel und die jeweilige beste gefundene Lösung gemerkt.
+Danach wird der aktuelle Pfandkuchenstapel und die jeweilige beste gefundene Lösung gemerkt.
 Zu Beginn eines jeden Rekursionsschritts wird überprüft, ob nicht genau dieser Pfandkuchenstapel bereits gelöst wurde.
 Ist der Pfandkuchenstapel bereits gelöst worden, so wird darauf verzichtet diesen wieder in alle möglichen Pfandkuchenstapel
-aufzuteilen und es wird einfach die Zugfolge des gelösten Pfandkuchenstapels verwendet. \\
+aufzuteilen und es wird direkt die Zugfolge des gelösten Pfandkuchenstapels verwendet. \\
 Dieses Verfahren garantiert einerseits, dass die Zugfolge optimal kurz ist, und zugleich nicht unnötig
 oft derselbe Pfandkuchenstapel gelöst wird. \\
-Um die PWUE-Zahl einer Pfandkuchenstapelhöhe zu generieren müssen alle Pfandkuchenstapel der besagten Höhe generiert,
-sortiert und abschlie{\ss}end bezüglich der Länge ihrer Zufolge evaluiert werden.
-Problematisch hierbei ist die schiere Menge der zu prüfenden Pfandkuchenstapel, sowie die Menge der Einträge, die sich,
-infolge des Dynamic Programming Ansatzes, gemerkt werden müssen.
+Um die PWUE-Zahl einer Pfandkuchenstapelhöhe zu generieren, müssen alle Pfandkuchenstapel der besagten Höhe generiert,
+sortiert und abschlie{\ss}end bezüglich der Länge ihrer Zugfolge evaluiert werden.
+Problematisch hierbei ist die schiere Menge der zu prüfenden Pfandkuchenstapel, sowie die Menge der Einträge, die
+infolge des Dynamic Programming Ansatzes, gemerkt werden müssen. \\
 Für die Anzahl der zu prüfenden Pfandkuchenstapel gilt $h!$ wobei $h$ die Höhe der betrachteten Pfandkuchenstapel ist.
 Um die zu merkende Datenmenge zu reduzieren, wird die Art und Weise wie Pfandkuchenstapel gelöst werden modifiziert.
 Ziel ist es nun nicht mehr, die Zugfolge zu finden, sondern lediglich die Anzahl der nötigen Wende-und-Essoperationen.
 Zudem werden die PWUE-Zahlen dynamisch generiert.
-Sucht man also bspw die PWUE-Zahl der Höhe 7, so wird zunächst die PWUE-Zahl der Höhe 1, dann 2, dann 3, etc generiert,
+Sucht man also bspw.\ die PWUE-Zahl der Höhe 7, so wird zunächst die PWUE-Zahl der Höhe 1, dann 2, dann 3, etc.\ generiert,
 und dementsprechend auch alle Pfandkuchenstapel der Höhe 1, 2, 3 etc.
 Dieser Bottom-Up Ansatz hat den Vorteil, dass man sich sicher sein kann, dass alle Pfandkuchenstapel der vorherigen
 Höhen bereits gelöst wurden.
+Das eröffnet die Möglichkeit Einträge gezielt nicht zu merken.
 Im vorher verwendeten Top-Down Ansatz würde man bei fehlenden Einträgen davon ausgehen, dass diese schlicht noch nicht
 berechnet wurden und deswegen fehlen.
 Jetzt kann aber davon ausgegangen werden, dass diese absichtlich fehlen,
 schlie{\ss}lich wurden ja alle vorherigen Pfandkuchenstapel gelöst.
-Dadurch kann durch die \textit{absenz von Einträgen} Information ausgedrückt werden, ohne kostbaren
-Arbeitsspeicher aufzuwenden.
+Dadurch kann durch die \textit{Absenz von Einträgen} Information ausgedrückt werden, ohne kostbaren Speicher aufzuwenden.
 Konkret werden, nachdem die PWUE-Zahl einer Zahl $n$ ermittelt wurde, alle Einträge gelöscht, welche eine so kurze Zugfolge
 aufweisen, sodass sie für die PWUE-Zahl von $n + 1$ nicht relevant sind.
 Die Zugfolge ist genau dann zu kurz, wenn sie kleiner als $n - 2$ ist.
@@ -58,244 +58,368 @@ Die Implementierung erfolgt in Java 17.
 
 \subsection{Beispiel Dateien}\label{subsec:beispiel-dateien}
 Es folgen die Pfandkuchenstapel der Beispieldateien und die jeweilige Programmausgabe.
-pancake0.txt \\
-Input pancake stack PancakeStackData\{pancakes=[1, 5, 4, 2, 3]\} \\
-Shortest order of flipping operations with length 2 \\
-Order of operations [0, 0] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[5, 4, 2]\}\} \\
-Map entry count 9 \\
-pancake1.txt \\
-Input pancake stack PancakeStackData\{pancakes=[5, 2, 4, 7, 1, 3, 6]\} \\
-Shortest order of flipping operations with length 3 \\
-Order of operations [1, 1, 2] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[5, 4, 3, 1]\}\} \\
-Map entry count 69 \\
-pancake2.txt \\
-Input pancake stack PancakeStackData\{pancakes=[2, 4, 6, 3, 5, 7, 1, 8]\} \\
-Shortest order of flipping operations with length 4 \\
-Order of operations [4, 5, 3, 0] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[8, 7, 6, 4]\}\} \\
-Map entry count 147 \\
-pancake3.txt \\
-Input pancake stack PancakeStackData\{pancakes=[6, 3, 7, 9, 2, 8, 4, 11, 1, 10, 5]\} \\
-Shortest order of flipping operations with length 6 \\
-Order of operations [0, 5, 8, 2, 0, 1] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[11, 10, 9, 7, 3]\}\} \\
-Map entry count 3067 \\
-pancake4.txt \\
-Input pancake stack PancakeStackData\{pancakes=[2, 8, 3, 9, 12, 13, 1, 6, 10, 5, 11, 4, 7]\} \\
-Shortest order of flipping operations with length 7 \\
-Order of operations [1, 7, 2, 1, 0, 6, 2] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[6, 5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[13, 12, 11, 10, 6, 3]\}\} \\
-Map entry count 26571 \\
-pancake5.txt \\
-Input pancake stack PancakeStackData\{pancakes=[11, 5, 6, 12, 1, 14, 9, 7, 3, 2, 8, 10, 13, 4]\} \\
-Shortest order of flipping operations with length 6 \\
-Order of operations [13, 0, 5, 2, 5, 3] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[8, 7, 6, 5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[13, 10, 9, 6, 5, 3, 2, 1]\}\} \\
-Map entry count 87663 \\
-pancake6.txt \\
-Input pancake stack PancakeStackData\{pancakes=[6, 10, 5, 9, 3, 11, 7, 15, 1, 2, 13, 12, 4, 8, 14]\} \\
-Shortest order of flipping operations with length 8 \\
-Order of operations [1, 4, 6, 2, 7, 3, 0, 0] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[7, 6, 5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[14, 11, 9, 5, 4, 2, 1]\}\} \\
-Map entry count 293466 \\
-pancake7.txt \\
-Input pancake stack PancakeStackData\{pancakes=[11, 16, 14, 1, 9, 12, 4, 2, 6, 13, 7, 3, 15, 10, 5, 8]\} \\
-Shortest order of flipping operations with length 8 \\
-Order of operations [5, 0, 0, 8, 10, 5, 2, 3] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[8, 7, 6, 5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[16, 14, 10, 9, 8, 7, 6, 2]\}\} \\
-Map entry count 1057379 \\
+\subsubsection{pancake0.txt}
+{\obeylines
 
-\subsection{Weitere Pfandkuchenstapel}\label{subsec:weitere-pfandkuchenstapel}
-Höhe 18 \\
-Input pancake stack PancakeStackData\{pancakes=[13, 16, 3, 7, 15, 1, 2, 18, 9, 4, 5, 11, 6, 12, 14, 8, 10, 17]\} \\
-Shortest order of flipping operations with length 9 \\
-Order of operations [8, 6, 0, 2, 9, 9, 3, 10, 9] \\
-Resulting pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[9, 8, 7, 6, 5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[18, 17, 16, 14, 12, 6, 5, 4, 1]\}\} \\
-Map entry count 12304905 \\
-Höhe 19 \\
+Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
+    Wende-und-Essoperation an Index 0: [3, 2, 4, 5] -> [5, 4, 2]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [1, 5, 4, 2, 3]
+    [5, 4, 2]
+    [0, 0]
+    Benötigte Wende-und-Essoperationen 2
+    \subsubsection{pancake1.txt}
 
-\subsection{PWUE-Zahlen}\label{subsec:pwue-zahlen}
-Höhe 1 \\
-PWUE of number 1 is 0 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1]\}, pancakes=PancakeStackData\{pancakes=[1]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1]\}, pancakes=PancakeStackData\{pancakes=[1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[]\} \\
-Sorter map contains 0 entries \\
-Timings report \\
-Time spend finding PWUE nr 2 ms \\
-Höhe 2 \\
-PWUE of number 2 is 1 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 2]\}, pancakes=PancakeStackData\{pancakes=[1, 2]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1]\}, pancakes=PancakeStackData\{pancakes=[2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0]\} \\
-Sorter map contains 1 entries \\
-Timings report \\
-Time spend finding PWUE nr 3 ms \\
-Höhe 3 \\
-PWUE of number 3 is 2 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 3, 2]\}, pancakes=PancakeStackData\{pancakes=[1, 3, 2]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1]\}, pancakes=PancakeStackData\{pancakes=[3]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 0]\} \\
-Sorter map contains 6 entries \\
-Timings report \\
-Time spend finding PWUE nr 84 ms \\
-Höhe 4 \\
-PWUE of number 4 is 2 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 1, 3, 2]\}, pancakes=PancakeStackData\{pancakes=[4, 1, 3, 2]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[2, 1]\}, pancakes=PancakeStackData\{pancakes=[4, 3]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[1, 1]\} \\
-Sorter map contains 6 entries \\
-Timings report \\
-Time spend finding PWUE nr 74 ms \\
-Höhe 5 \\
-PWUE of number 5 is 3 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 3, 5, 2, 4]\}, pancakes=PancakeStackData\{pancakes=[1, 3, 5, 2, 4]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[2, 1]\}, pancakes=PancakeStackData\{pancakes=[5, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 3, 0]\} \\
-Sorter map contains 45 entries \\
-Timings report \\
-Time spend finding PWUE nr 88 ms \\
-Höhe 6 \\
-PWUE of number 6 is 3 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 1, 6, 3, 4, 2]\}, pancakes=PancakeStackData\{pancakes=[5, 1, 6, 3, 4, 2]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[3, 2, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[4, 2, 0]\} \\
-Sorter map contains 39 entries \\
-Timings report \\
-Time spend finding PWUE nr 88 ms \\
-Höhe 7 \\
-PWUE of number 7 is 4 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 5, 7, 3, 4, 6, 2]\}, pancakes=PancakeStackData\{pancakes=[1, 5, 7, 3, 4, 6, 2]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[7, 6, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[1, 0, 2, 1]\} \\
-Sorter map contains 297 entries \\
-Timings report \\
-Time spend finding PWUE nr 172 ms \\
-Höhe 8 \\
-PWUE of number 8 is 5 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 5, 8, 2, 7, 3, 6, 4]\}, pancakes=PancakeStackData\{pancakes=[1, 5, 8, 2, 7, 3, 6, 4]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[8, 4, 3]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[3, 4, 1, 0, 2]\} \\
-Sorter map contains 2463 entries \\
-Timings report \\
-Time spend finding PWUE nr 360 ms \\
-Höhe 9 \\
-PWUE of number 9 is 5 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 5, 9, 1, 6, 8, 4, 7, 2]\}, pancakes=PancakeStackData\{pancakes=[3, 5, 9, 1, 6, 8, 4, 7, 2]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[9, 8, 4, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[1, 0, 5, 2, 1]\} \\
-Sorter map contains 2333 entries \\
-Timings report \\
-Time spend finding PWUE nr 1351 ms \\
-Höhe 10 \\
-PWUE of number 10 is 6 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 6, 10, 1, 7, 2, 8, 4, 9, 5]\}, pancakes=PancakeStackData\{pancakes=[3, 6, 10, 1, 7, 2, 8, 4, 9, 5]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[9, 8, 2, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[2, 7, 2, 0, 1, 1]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[6, 3, 10, 2, 5, 8, 1, 7, 9, 4]\}, pancakes=PancakeStackData\{pancakes=[6, 3, 10, 2, 5, 8, 1, 7, 9, 4]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[9, 5, 2, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[1, 1, 4, 1, 2, 0]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 10, 2, 5, 8, 3, 6, 9, 4, 7]\}, pancakes=PancakeStackData\{pancakes=[1, 10, 2, 5, 8, 3, 6, 9, 4, 7]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[9, 6, 3, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 1, 0, 4, 4, 3]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[2, 7, 3, 8, 1, 10, 6, 4, 9, 5]\}, pancakes=PancakeStackData\{pancakes=[2, 7, 3, 8, 1, 10, 6, 4, 9, 5]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[8, 7, 5, 4]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[2, 6, 3, 3, 0, 1]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[2, 10, 6, 1, 9, 5, 3, 8, 4, 7]\}, pancakes=PancakeStackData\{pancakes=[2, 10, 6, 1, 9, 5, 3, 8, 4, 7]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 9, 5, 3]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 6, 0, 0, 0, 4]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 6, 9, 2, 10, 3, 8, 1, 7, 5]\}, pancakes=PancakeStackData\{pancakes=[4, 6, 9, 2, 10, 3, 8, 1, 7, 5]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[5, 3, 2, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 3, 4, 5, 3, 1]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 9, 3, 6, 8, 4, 7, 2, 10, 5]\}, pancakes=PancakeStackData\{pancakes=[1, 9, 3, 6, 8, 4, 7, 2, 10, 5]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 9, 7, 4]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[2, 7, 4, 2, 0, 1]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 6, 10, 2, 9, 4, 8, 3, 7, 5]\}, pancakes=PancakeStackData\{pancakes=[1, 6, 10, 2, 9, 4, 8, 3, 7, 5]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 9, 8, 3]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 4, 4, 0, 1, 1]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[3, 5, 10, 4, 8, 2, 6, 9, 1, 7]\}, pancakes=PancakeStackData\{pancakes=[3, 5, 10, 4, 8, 2, 6, 9, 1, 7]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 9, 8, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 3, 1, 3, 4, 0]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 10, 3, 5, 9, 4, 7, 2, 8, 6]\}, pancakes=PancakeStackData\{pancakes=[1, 10, 3, 5, 9, 4, 7, 2, 8, 6]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 8, 7, 4]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[2, 4, 4, 0, 4, 0]\} \\
-Sorter map contains 159112 entries \\
-Timings report \\
-Time spend finding PWUE nr 7969 ms \\
-Höhe 11 \\
-PWUE of number 11 is 6 \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[4, 1, 10, 6, 7, 5, 8, 3, 11, 2, 9]\}, pancakes=PancakeStackData\{pancakes=[4, 1, 10, 6, 7, 5, 8, 3, 11, 2, 9]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[8, 7, 6, 2, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 2, 6, 6, 0, 3]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[2, 5, 8, 1, 10, 11, 7, 4, 9, 6, 3]\}, pancakes=PancakeStackData\{pancakes=[2, 5, 8, 1, 10, 11, 7, 4, 9, 6, 3]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[11, 9, 6, 3, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[1, 7, 5, 0, 3, 1]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[7, 11, 2, 4, 9, 10, 5, 3, 8, 1, 6]\}, pancakes=PancakeStackData\{pancakes=[7, 11, 2, 4, 9, 10, 5, 3, 8, 1, 6]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[11, 9, 5, 3, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 7, 5, 5, 0, 4]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 7, 2, 5, 11, 6, 8, 10, 3, 9, 4]\}, pancakes=PancakeStackData\{pancakes=[1, 7, 2, 5, 11, 6, 8, 10, 3, 9, 4]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 8, 6, 5, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 0, 7, 3, 3, 0]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[6, 4, 7, 2, 8, 5, 11, 3, 10, 1, 9]\}, pancakes=PancakeStackData\{pancakes=[6, 4, 7, 2, 8, 5, 11, 3, 10, 1, 9]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[8, 7, 4, 3, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 4, 2, 2, 5, 0]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[2, 4, 8, 1, 7, 11, 6, 10, 5, 3, 9]\}, pancakes=PancakeStackData\{pancakes=[2, 4, 8, 1, 7, 11, 6, 10, 5, 3, 9]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[9, 7, 6, 5, 4]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 3, 7, 5, 1, 3]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[7, 4, 10, 5, 1, 8, 2, 6, 11, 3, 9]\}, pancakes=PancakeStackData\{pancakes=[7, 4, 10, 5, 1, 8, 2, 6, 11, 3, 9]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[11, 10, 9, 8, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[3, 1, 6, 3, 6, 0]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[8, 10, 5, 2, 9, 1, 7, 4, 11, 3, 6]\}, pancakes=PancakeStackData\{pancakes=[8, 10, 5, 2, 9, 1, 7, 4, 11, 3, 6]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[10, 9, 7, 4, 3]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 0, 2, 6, 1, 4]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[1, 11, 7, 3, 6, 2, 8, 9, 4, 10, 5]\}, pancakes=PancakeStackData\{pancakes=[1, 11, 7, 3, 6, 2, 8, 9, 4, 10, 5]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[11, 10, 9, 8, 2]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 0, 1, 7, 2, 2]\} \\
-Example worst case pancake stack PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 1, 11, 6, 8, 3, 9, 2, 10, 4, 7]\}, pancakes=PancakeStackData\{pancakes=[5, 1, 11, 6, 8, 3, 9, 2, 10, 4, 7]\}\} \\
-Solved PancakeStack\{normalizedPancakes=PancakeStackData\{pancakes=[5, 4, 3, 2, 1]\}, pancakes=PancakeStackData\{pancakes=[9, 8, 6, 4, 1]\}\} \\
-Flippings operations to solve pancake stack FlippingOrder\{flippingOperations=[0, 2, 6, 6, 0, 3]\} \\
-Sorter map contains 49735 entries \\
-Timings report \\
-Time spend finding PWUE nr 81002 ms \\
-Höhe 12 \\
-PWUE of number 12 is 7 \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[3, 11, 7, 4, 9, 6, 12, 2, 8, 1, 10, 5]}, pancakes=PancakeStackData{pancakes=[3, 11, 7, 4, 9, 6, 12, 2, 8, 1, 10, 5]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[12, 11, 10, 9, 4]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[0, 3, 2, 4, 2, 0, 2]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[3, 7, 11, 1, 8, 5, 12, 6, 4, 10, 2, 9]}, pancakes=PancakeStackData{pancakes=[3, 7, 11, 1, 8, 5, 12, 6, 4, 10, 2, 9]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[11, 7, 6, 4, 2]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[4, 3, 0, 5, 2, 2, 0]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[4, 8, 2, 11, 5, 12, 1, 6, 9, 3, 7, 10]}, pancakes=PancakeStackData{pancakes=[4, 8, 2, 11, 5, 12, 1, 6, 9, 3, 7, 10]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[12, 11, 10, 7, 3]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[1, 5, 0, 4, 0, 5, 0]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[2, 6, 9, 4, 8, 11, 5, 10, 1, 7, 12, 3]}, pancakes=PancakeStackData{pancakes=[2, 6, 9, 4, 8, 11, 5, 10, 1, 7, 12, 3]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[12, 7, 6, 5, 4]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[0, 3, 9, 6, 0, 0, 3]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[10, 2, 12, 8, 4, 7, 1, 11, 6, 3, 9, 5]}, pancakes=PancakeStackData{pancakes=[10, 2, 12, 8, 4, 7, 1, 11, 6, 3, 9, 5]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[10, 8, 4, 3, 1]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[1, 2, 8, 2, 1, 5, 3]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[3, 8, 11, 6, 9, 2, 10, 7, 1, 5, 12, 4]}, pancakes=PancakeStackData{pancakes=[3, 8, 11, 6, 9, 2, 10, 7, 1, 5, 12, 4]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[11, 8, 7, 5, 2]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[0, 5, 1, 2, 3, 3, 0]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[8, 2, 9, 5, 11, 3, 10, 1, 6, 12, 4, 7]}, pancakes=PancakeStackData{pancakes=[8, 2, 9, 5, 11, 3, 10, 1, 6, 12, 4, 7]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[12, 11, 10, 7, 2]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[2, 3, 8, 5, 3, 4, 0]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 3, 8, 2, 6, 10, 1, 7, 11, 4, 12, 9]}, pancakes=PancakeStackData{pancakes=[5, 3, 8, 2, 6, 10, 1, 7, 11, 4, 12, 9]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[10, 9, 8, 7, 4]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[1, 2, 8, 4, 0, 1, 3]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[4, 9, 2, 5, 11, 3, 6, 12, 7, 10, 1, 8]}, pancakes=PancakeStackData{pancakes=[4, 9, 2, 5, 11, 3, 6, 12, 7, 10, 1, 8]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[10, 7, 6, 5, 2]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[0, 1, 5, 4, 0, 2, 2]} \\
-Example worst case pancake stack PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[2, 6, 11, 4, 7, 12, 1, 10, 3, 8, 5, 9]}, pancakes=PancakeStackData{pancakes=[2, 6, 11, 4, 7, 12, 1, 10, 3, 8, 5, 9]}} \\
-Solved PancakeStack{normalizedPancakes=PancakeStackData{pancakes=[5, 4, 3, 2, 1]}, pancakes=PancakeStackData{pancakes=[9, 7, 6, 3, 1]}} \\
-Flippings operations to solve pancake stack FlippingOrder{flippingOperations=[3, 4, 9, 2, 0, 2, 4]} \\
-Sorter map contains 1644576 entries \\
-Timings report \\
-Time spend finding PWUE nr 928590 ms \\
+    Wende-und-Essoperation an Index 1: [5, 2, 4, 7, 1, 3, 6] -> [5, 6, 3, 1, 7, 4]
+    Wende-und-Essoperation an Index 1: [5, 6, 3, 1, 7, 4] -> [5, 4, 7, 1, 3]
+    Wende-und-Essoperation an Index 2: [5, 4, 7, 1, 3] -> [5, 4, 3, 1]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [5, 2, 4, 7, 1, 3, 6]
+    [5, 4, 3, 1]
+    [1, 1, 2]
+    Benötigte Wende-und-Essoperationen 3
+    \subsubsection{pancake2.txt}
 
-Höhe 13 \\
+    Wende-und-Essoperation an Index 4: [2, 4, 6, 3, 5, 7, 1, 8] -> [2, 4, 6, 3, 8, 1, 7]
+    Wende-und-Essoperation an Index 5: [2, 4, 6, 3, 8, 1, 7] -> [2, 4, 6, 3, 8, 7]
+    Wende-und-Essoperation an Index 3: [2, 4, 6, 3, 8, 7] -> [2, 4, 6, 7, 8]
+    Wende-und-Essoperation an Index 0: [2, 4, 6, 7, 8] -> [8, 7, 6, 4]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [2, 4, 6, 3, 5, 7, 1, 8]
+    [8, 7, 6, 4]
+    [4, 5, 3, 0]
+    Benötigte Wende-und-Essoperationen 4
+    \subsubsection{pancake3.txt}
+
+    Wende-und-Essoperation an Index 0: [6, 3, 7, 9, 2, 8, 4, 11, 1, 10, 5] -> [5, 10, 1, 11, 4, 8, 2, 9, 7, 3]
+    Wende-und-Essoperation an Index 5: [5, 10, 1, 11, 4, 8, 2, 9, 7, 3] -> [5, 10, 1, 11, 4, 3, 7, 9, 2]
+    Wende-und-Essoperation an Index 8: [5, 10, 1, 11, 4, 3, 7, 9, 2] -> [5, 10, 1, 11, 4, 3, 7, 9]
+    Wende-und-Essoperation an Index 2: [5, 10, 1, 11, 4, 3, 7, 9] -> [5, 10, 9, 7, 3, 4, 11]
+    Wende-und-Essoperation an Index 0: [5, 10, 9, 7, 3, 4, 11] -> [11, 4, 3, 7, 9, 10]
+    Wende-und-Essoperation an Index 1: [11, 4, 3, 7, 9, 10] -> [11, 10, 9, 7, 3]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [6, 3, 7, 9, 2, 8, 4, 11, 1, 10, 5]
+    [11, 10, 9, 7, 3]
+    [0, 5, 8, 2, 0, 1]
+    Benötigte Wende-und-Essoperationen 6
+    \subsubsection{pancake4.txt}
+
+    Wende-und-Essoperation an Index 1: [2, 8, 3, 9, 12, 13, 1, 6, 10, 5, 11, 4, 7] -> [2, 7, 4, 11, 5, 10, 6, 1, 13, 12, 9, 3]
+    Wende-und-Essoperation an Index 7: [2, 7, 4, 11, 5, 10, 6, 1, 13, 12, 9, 3] -> [2, 7, 4, 11, 5, 10, 6, 3, 9, 12, 13]
+    Wende-und-Essoperation an Index 2: [2, 7, 4, 11, 5, 10, 6, 3, 9, 12, 13] -> [2, 7, 13, 12, 9, 3, 6, 10, 5, 11]
+    Wende-und-Essoperation an Index 1: [2, 7, 13, 12, 9, 3, 6, 10, 5, 11] -> [2, 11, 5, 10, 6, 3, 9, 12, 13]
+    Wende-und-Essoperation an Index 0: [2, 11, 5, 10, 6, 3, 9, 12, 13] -> [13, 12, 9, 3, 6, 10, 5, 11]
+    Wende-und-Essoperation an Index 6: [13, 12, 9, 3, 6, 10, 5, 11] -> [13, 12, 9, 3, 6, 10, 11]
+    Wende-und-Essoperation an Index 2: [13, 12, 9, 3, 6, 10, 11] -> [13, 12, 11, 10, 6, 3]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [2, 8, 3, 9, 12, 13, 1, 6, 10, 5, 11, 4, 7]
+    [13, 12, 11, 10, 6, 3]
+    [1, 7, 2, 1, 0, 6, 2]
+    Benötigte Wende-und-Essoperationen 7
+    \subsubsection{pancake5.txt}
+
+    Wende-und-Essoperation an Index 13: [11, 5, 6, 12, 1, 14, 9, 7, 3, 2, 8, 10, 13, 4] -> [11, 5, 6, 12, 1, 14, 9, 7, 3, 2, 8, 10, 13]
+    Wende-und-Essoperation an Index 0: [11, 5, 6, 12, 1, 14, 9, 7, 3, 2, 8, 10, 13] -> [13, 10, 8, 2, 3, 7, 9, 14, 1, 12, 6, 5]
+    Wende-und-Essoperation an Index 5: [13, 10, 8, 2, 3, 7, 9, 14, 1, 12, 6, 5] -> [13, 10, 8, 2, 3, 5, 6, 12, 1, 14, 9]
+    Wende-und-Essoperation an Index 2: [13, 10, 8, 2, 3, 5, 6, 12, 1, 14, 9] -> [13, 10, 9, 14, 1, 12, 6, 5, 3, 2]
+    Wende-und-Essoperation an Index 5: [13, 10, 9, 14, 1, 12, 6, 5, 3, 2] -> [13, 10, 9, 14, 1, 2, 3, 5, 6]
+    Wende-und-Essoperation an Index 3: [13, 10, 9, 14, 1, 2, 3, 5, 6] -> [13, 10, 9, 6, 5, 3, 2, 1]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [11, 5, 6, 12, 1, 14, 9, 7, 3, 2, 8, 10, 13, 4]
+    [13, 10, 9, 6, 5, 3, 2, 1]
+    [13, 0, 5, 2, 5, 3]
+    Benötigte Wende-und-Essoperationen 6
+    \subsubsection{pancake6.txt}
+
+    Wende-und-Essoperation an Index 1: [6, 10, 5, 9, 3, 11, 7, 15, 1, 2, 13, 12, 4, 8, 14] -> [6, 14, 8, 4, 12, 13, 2, 1, 15, 7, 11, 3, 9, 5]
+    Wende-und-Essoperation an Index 4: [6, 14, 8, 4, 12, 13, 2, 1, 15, 7, 11, 3, 9, 5] -> [6, 14, 8, 4, 5, 9, 3, 11, 7, 15, 1, 2, 13]
+    Wende-und-Essoperation an Index 6: [6, 14, 8, 4, 5, 9, 3, 11, 7, 15, 1, 2, 13] -> [6, 14, 8, 4, 5, 9, 13, 2, 1, 15, 7, 11]
+    Wende-und-Essoperation an Index 2: [6, 14, 8, 4, 5, 9, 13, 2, 1, 15, 7, 11] -> [6, 14, 11, 7, 15, 1, 2, 13, 9, 5, 4]
+    Wende-und-Essoperation an Index 7: [6, 14, 11, 7, 15, 1, 2, 13, 9, 5, 4] -> [6, 14, 11, 7, 15, 1, 2, 4, 5, 9]
+    Wende-und-Essoperation an Index 3: [6, 14, 11, 7, 15, 1, 2, 4, 5, 9] -> [6, 14, 11, 9, 5, 4, 2, 1, 15]
+    Wende-und-Essoperation an Index 0: [6, 14, 11, 9, 5, 4, 2, 1, 15] -> [15, 1, 2, 4, 5, 9, 11, 14]
+    Wende-und-Essoperation an Index 0: [15, 1, 2, 4, 5, 9, 11, 14] -> [14, 11, 9, 5, 4, 2, 1]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [6, 10, 5, 9, 3, 11, 7, 15, 1, 2, 13, 12, 4, 8, 14]
+    [14, 11, 9, 5, 4, 2, 1]
+    [1, 4, 6, 2, 7, 3, 0, 0]
+    Benötigte Wende-und-Essoperationen 8
+    \subsubsection{pancake7.txt}
+
+    Wende-und-Essoperation an Index 5: [11, 16, 14, 1, 9, 12, 4, 2, 6, 13, 7, 3, 15, 10, 5, 8] -> [11, 16, 14, 1, 9, 8, 5, 10, 15, 3, 7, 13, 6, 2, 4]
+    Wende-und-Essoperation an Index 0: [11, 16, 14, 1, 9, 8, 5, 10, 15, 3, 7, 13, 6, 2, 4] -> [4, 2, 6, 13, 7, 3, 15, 10, 5, 8, 9, 1, 14, 16]
+    Wende-und-Essoperation an Index 0: [4, 2, 6, 13, 7, 3, 15, 10, 5, 8, 9, 1, 14, 16] -> [16, 14, 1, 9, 8, 5, 10, 15, 3, 7, 13, 6, 2]
+    Wende-und-Essoperation an Index 8: [16, 14, 1, 9, 8, 5, 10, 15, 3, 7, 13, 6, 2] -> [16, 14, 1, 9, 8, 5, 10, 15, 2, 6, 13, 7]
+    Wende-und-Essoperation an Index 10: [16, 14, 1, 9, 8, 5, 10, 15, 2, 6, 13, 7] -> [16, 14, 1, 9, 8, 5, 10, 15, 2, 6, 7]
+    Wende-und-Essoperation an Index 5: [16, 14, 1, 9, 8, 5, 10, 15, 2, 6, 7] -> [16, 14, 1, 9, 8, 7, 6, 2, 15, 10]
+    Wende-und-Essoperation an Index 2: [16, 14, 1, 9, 8, 7, 6, 2, 15, 10] -> [16, 14, 10, 15, 2, 6, 7, 8, 9]
+    Wende-und-Essoperation an Index 3: [16, 14, 10, 15, 2, 6, 7, 8, 9] -> [16, 14, 10, 9, 8, 7, 6, 2]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [11, 16, 14, 1, 9, 12, 4, 2, 6, 13, 7, 3, 15, 10, 5, 8]
+    [16, 14, 10, 9, 8, 7, 6, 2]
+    [5, 0, 0, 8, 10, 5, 2, 3]
+    Benötigte Wende-und-Essoperationen 8
+    \subsection{Weitere Pfandkuchenstapel}\label{sec:weitere-pfandkuchenstapel}
+    \subsubsection{Höhe 18}
+
+    Wende-und-Essoperation an Index 3: [17, 10, 8, 14, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 3, 16, 13] -> [17, 10, 8, 13, 16, 3, 7, 15, 1, 2, 18, 9, 4, 5, 11, 6, 12]
+    Wende-und-Essoperation an Index 1: [17, 10, 8, 13, 16, 3, 7, 15, 1, 2, 18, 9, 4, 5, 11, 6, 12] -> [17, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 3, 16, 13, 8]
+    Wende-und-Essoperation an Index 12: [17, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 3, 16, 13, 8] -> [17, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 8, 13, 16]
+    Wende-und-Essoperation an Index 7: [17, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 8, 13, 16] -> [17, 12, 6, 11, 5, 4, 9, 16, 13, 8, 7, 15, 1, 2]
+    Wende-und-Essoperation an Index 6: [17, 12, 6, 11, 5, 4, 9, 16, 13, 8, 7, 15, 1, 2] -> [17, 12, 6, 11, 5, 4, 2, 1, 15, 7, 8, 13, 16]
+    Wende-und-Essoperation an Index 1: [17, 12, 6, 11, 5, 4, 2, 1, 15, 7, 8, 13, 16] -> [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 11, 6]
+    Wende-und-Essoperation an Index 10: [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 11, 6] -> [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 6]
+    Wende-und-Essoperation an Index 5: [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 6] -> [17, 16, 13, 8, 7, 6, 5, 4, 2, 1]
+    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    [17, 10, 8, 14, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 3, 16, 13]
+    [17, 16, 13, 8, 7, 6, 5, 4, 2, 1]
+    [3, 1, 12, 7, 6, 1, 10, 5]
+    Benötigte Wende-und-Essoperationen 8
+    \subsection{PWUE-Zahlen}\label{sec:pwue-zahlen}
+    \subsubsection{Höhe 1}
+
+    PWUE of number 1 is 0
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [1]
+    [1]
+    []
+    Sorter map contains 0 entries
+    Timings report
+    Time spend finding PWUE nr 2 ms
+    \subsubsection{Höhe 2}
+
+    PWUE of number 2 is 1
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [1, 2]
+    [2]
+    [0]
+    Sorter map contains 1 entries
+    Timings report
+    Time spend finding PWUE nr 1 ms
+    \subsubsection{Höhe 3}
+
+    PWUE of number 3 is 2
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [1, 3, 2]
+    [1]
+    [1, 1]
+    Sorter map contains 6 entries
+    Timings report
+    Time spend finding PWUE nr 6 ms
+    \subsubsection{Höhe 4}
+
+    PWUE of number 4 is 2
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [2, 4, 1, 3]
+    [4, 1]
+    [0, 0]
+    Sorter map contains 5 entries
+    Timings report
+    Time spend finding PWUE nr 13 ms
+    \subsubsection{Höhe 5}
+
+    PWUE of number 5 is 3
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [1, 4, 5, 2, 3]
+    [4, 3]
+    [2, 0, 0]
+    Sorter map contains 16 entries
+    Timings report
+    Time spend finding PWUE nr 19 ms
+    \subsubsection{Höhe 6}
+
+    PWUE of number 6 is 3
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [4, 1, 6, 2, 5, 3]
+    [5, 3, 1]
+    [3, 0, 2]
+    Sorter map contains 24 entries
+    Timings report
+    Time spend finding PWUE nr 94 ms
+    \subsubsection{Höhe 7}
+
+    PWUE of number 7 is 4
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [4, 6, 7, 5, 1, 3, 2]
+    [7, 5, 2]
+    [1, 0, 3, 2]
+    Sorter map contains 86 entries
+    Timings report
+    Time spend finding PWUE nr 49 ms
+    \subsubsection{Höhe 8}
+
+    PWUE of number 8 is 5
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [2, 4, 8, 1, 5, 7, 3, 6]
+    [8, 4, 3]
+    [5, 4, 0, 2, 0]
+    Sorter map contains 2666 entries
+    Timings report
+    Time spend finding PWUE nr 176 ms
+    \subsubsection{Höhe 9}
+
+    PWUE of number 9 is 5
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [3, 7, 1, 9, 2, 6, 5, 8, 4]
+    [6, 5, 4, 1]
+    [1, 2, 4, 0, 2]
+    Sorter map contains 1705 entries
+    Timings report
+    Time spend finding PWUE nr 1123 ms
+    \subsubsection{Höhe 10}
+
+    PWUE of number 10 is 6
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [5, 10, 1, 4, 9, 3, 6, 8, 2, 7]
+    [5, 4, 3, 2]
+    [2, 1, 2, 4, 5, 2]
+    Example Worstcase Pancakestack
+    [1, 6, 9, 3, 7, 2, 10, 4, 8, 5]
+    [10, 8, 7, 6]
+    [3, 3, 6, 4, 0, 3]
+    Example Worstcase Pancakestack
+    [3, 2, 8, 5, 9, 1, 6, 10, 4, 7]
+    [5, 4, 2, 1]
+    [2, 0, 4, 5, 1, 3]
+    Example Worstcase Pancakestack
+    [1, 5, 8, 4, 10, 2, 6, 9, 3, 7]
+    [8, 7, 6, 2]
+    [1, 3, 2, 5, 0, 1]
+    Example Worstcase Pancakestack
+    [2, 6, 10, 1, 7, 4, 9, 3, 8, 5]
+    [5, 4, 3, 1]
+    [0, 7, 1, 5, 3, 1]
+    Example Worstcase Pancakestack
+    [1, 5, 10, 6, 8, 4, 7, 3, 9, 2]
+    [10, 8, 4, 2]
+    [1, 0, 5, 1, 1, 3]
+    Example Worstcase Pancakestack
+    [2, 6, 10, 5, 9, 4, 7, 3, 8, 1]
+    [10, 9, 4, 1]
+    [1, 0, 5, 1, 1, 3]
+    Example Worstcase Pancakestack
+    [4, 6, 8, 3, 7, 5, 10, 2, 9, 1]
+    [10, 7, 3, 1]
+    [2, 3, 5, 0, 1, 1]
+    Example Worstcase Pancakestack
+    [2, 5, 10, 3, 8, 1, 6, 9, 4, 7]
+    [9, 7, 3, 1]
+    [1, 6, 6, 2, 0, 1]
+    Example Worstcase Pancakestack
+    [5, 3, 7, 2, 6, 9, 1, 8, 10, 4]
+    [10, 8, 7, 2]
+    [4, 4, 0, 2, 2, 2]
+    Sorter map contains 254385 entries
+    Timings report
+    Time spend finding PWUE nr 9721 ms
+    \subsubsection{Höhe 11}
+
+    PWUE of number 11 is 6
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [3, 9, 7, 1, 10, 4, 8, 5, 11, 2, 6]
+    [9, 8, 4, 2, 1]
+    [0, 0, 7, 3, 4, 1]
+    Example Worstcase Pancakestack
+    [5, 11, 3, 10, 1, 8, 9, 6, 2, 7, 4]
+    [11, 10, 8, 7, 2]
+    [0, 0, 5, 1, 5, 1]
+    Example Worstcase Pancakestack
+    [3, 5, 11, 8, 2, 10, 7, 4, 1, 9, 6]
+    [11, 10, 7, 4, 1]
+    [1, 0, 7, 2, 1, 5]
+    Example Worstcase Pancakestack
+    [3, 8, 4, 1, 7, 2, 5, 9, 11, 6, 10]
+    [11, 10, 8, 5, 2]
+    [2, 3, 3, 0, 3, 0]
+    Example Worstcase Pancakestack
+    [3, 6, 1, 9, 7, 2, 10, 4, 8, 11, 5]
+    [11, 8, 4, 2, 1]
+    [0, 4, 6, 0, 0, 3]
+    Example Worstcase Pancakestack
+    [6, 8, 11, 4, 5, 1, 7, 2, 10, 3, 9]
+    [11, 8, 5, 3, 2]
+    [0, 7, 0, 3, 6, 4]
+    Example Worstcase Pancakestack
+    [5, 9, 4, 10, 2, 7, 11, 1, 8, 3, 6]
+    [11, 9, 4, 3, 2]
+    [0, 5, 2, 7, 0, 3]
+    Example Worstcase Pancakestack
+    [2, 1, 11, 10, 8, 4, 7, 3, 6, 9, 5]
+    [11, 10, 8, 6, 3]
+    [0, 1, 5, 0, 6, 0]
+    Example Worstcase Pancakestack
+    [3, 4, 10, 7, 1, 9, 5, 8, 2, 6, 11]
+    [11, 10, 8, 5, 1]
+    [0, 2, 2, 1, 2, 4]
+    Example Worstcase Pancakestack
+    [2, 4, 9, 11, 3, 6, 8, 1, 7, 5, 10]
+    [10, 5, 4, 3, 1]
+    [0, 5, 7, 4, 5, 2]
+    Sorter map contains 49110 entries
+    Timings report
+    Time spend finding PWUE nr 129081 ms
+    \subsubsection{Höhe 12}
+
+    PWUE of number 12 is 7
+    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+Example Worstcase Pancakestack
+    [4, 9, 5, 11, 8, 3, 10, 6, 2, 7, 12, 1]
+    [12, 11, 10, 6, 2]
+    [0, 0, 4, 3, 0, 6, 1]
+    Example Worstcase Pancakestack
+    [2, 12, 3, 8, 11, 7, 4, 9, 6, 1, 10, 5]
+    [12, 11, 9, 6, 1]
+    [3, 8, 9, 3, 0, 5, 0]
+    Example Worstcase Pancakestack
+    [8, 5, 1, 11, 2, 7, 12, 3, 6, 10, 4, 9]
+    [11, 10, 9, 7, 3]
+    [2, 0, 1, 7, 3, 1, 2]
+    Example Worstcase Pancakestack
+    [7, 3, 12, 4, 9, 5, 11, 1, 6, 10, 2, 8]
+    [11, 10, 9, 4, 3]
+    [0, 4, 0, 6, 1, 2, 4]
+    Example Worstcase Pancakestack
+    [4, 7, 1, 9, 5, 12, 8, 2, 10, 3, 11, 6]
+    [12, 9, 7, 6, 3]
+    [2, 9, 6, 3, 3, 0, 2]
+    Example Worstcase Pancakestack
+    [1, 8, 4, 9, 6, 11, 3, 7, 10, 2, 12, 5]
+    [12, 11, 10, 7, 4]
+    [0, 0, 5, 3, 5, 0, 4]
+    Example Worstcase Pancakestack
+    [1, 7, 9, 4, 11, 5, 8, 3, 12, 6, 10, 2]
+    [12, 6, 5, 4, 2]
+    [1, 2, 6, 4, 4, 0, 4]
+    Example Worstcase Pancakestack
+    [5, 7, 11, 4, 9, 3, 12, 6, 8, 1, 10, 2]
+    [12, 10, 9, 8, 7]
+    [0, 4, 2, 5, 0, 4, 0]
+    Example Worstcase Pancakestack
+    [2, 12, 3, 10, 4, 6, 11, 5, 8, 1, 9, 7]
+    [7, 5, 4, 3, 1]
+    [0, 3, 7, 3, 6, 3, 1]
+    Example Worstcase Pancakestack
+    [3, 6, 11, 4, 7, 9, 1, 8, 10, 2, 5, 12]
+    [12, 10, 8, 7, 4]
+    [0, 1, 5, 5, 1, 3, 3]
+    Sorter map contains 2512306 entries
+    Timings report
+    Time spend finding PWUE nr 1303151 ms
+    \subsubsection{Höhe 13}
+
+    todo
+}
 
 
 \section{Quellcode}\label{sec:quellcode}

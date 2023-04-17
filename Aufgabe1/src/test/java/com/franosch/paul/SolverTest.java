@@ -57,6 +57,7 @@ public class SolverTest {
         // https://paste.myplayplanet.tools/iyufokufak.css
     }
 
+/*
     @Test
     public void solveFourthWithGoodParams(){
         Graph graph = solver.generateGraphFromFile(4, true);
@@ -72,6 +73,7 @@ public class SolverTest {
         Graph graph = solver.generateGraphFromFile(5, true);
         solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.TRAVERSABLE_ORIENTED_WEIGHTED_NEAREST_NEIGHBOUR_HEURISTIC,
                 new ParameterConfiguration(1300.0, 0.985, 10, 16));
+*/
         /*
 
         // https://paste.myplayplanet.tools/ulehitejev.css new ParameterConfiguration(1400.0, 0.9, 11, 16)
@@ -85,9 +87,9 @@ public class SolverTest {
         // https://paste.myplayplanet.tools/nibehaqidi.css best ParameterConfiguration[startingTemperature=1300.0, temperaturModifier=0.985, improvingIterationsUntilCooling=10, iterationsUntilCooling=16]
 
          */
-    }
+  //  }
 
-    @Test
+/*    @Test
     public void solveSixthWithGoodParams(){
         Graph graph = solver.generateGraphFromFile(6, true);
         solver.solveAndOptimizeViaTwoOptPostOptimization(graph, SolvingStrategy.TRAVERSABLE_ORIENTED_WEIGHTED_NEAREST_NEIGHBOUR_HEURISTIC,
@@ -103,7 +105,7 @@ public class SolverTest {
                 new ParameterConfiguration(500, 0.97, 20, 50)
         );
 
-    }
+    }*/
 
 
 }

@@ -5,7 +5,6 @@ import com.franosch.paul.model.Vector;
 public class VectorCalculator {
 
     public static boolean matchesAngleCriteria(Vector first, Vector second) {
-        // TODO: 29.03.2023 evtl ist es besser das hier zu cachen
         double degree = VectorCalculator.calcDegree(first, second);
         return degree >= 90;
     }

@@ -15,5 +15,4 @@ public record Vector(double x, double y) {
         return new Vector(-vector.x(), -vector.y());
     }
 
-
 }

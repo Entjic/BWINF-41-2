@@ -26,7 +26,7 @@ public class Main {
                         System.out.println("Expected integer value: " + fileInput + " is not an integer!");
                         System.exit(0);
                     }
-                    solver.solveFile(Integer.parseInt(fileInput), true);
+                    solver.solveFile(Integer.parseInt(fileInput), true, true);
                     // System.exit(0);
                 }
                 case 2 -> {
@@ -37,7 +37,7 @@ public class Main {
                         System.out.println("Expected integer value: " + heightInput + " is not an integer!");
                         System.exit(0);
                     }
-                    int pwue = solver.findPWUE(Integer.parseInt(heightInput));
+                    int pwue = solver.findPWUE(Integer.parseInt(heightInput), 10);
                     // System.exit(0);
                 }
                 default -> System.out.println("Es stehen nur die Modi 1 und 2 zur verfügung!");

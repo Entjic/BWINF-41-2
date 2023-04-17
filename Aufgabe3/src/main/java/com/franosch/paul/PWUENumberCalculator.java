@@ -1,8 +1,11 @@
 package com.franosch.paul;
 
 
-import com.franosch.paul.model.*;
+import com.franosch.paul.model.PancakeStack;
+import com.franosch.paul.model.PancakeStackData;
+import com.franosch.paul.model.PancakeStackSortingResult;
 import lombok.RequiredArgsConstructor;
+import reactor.core.Disposable;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -19,6 +22,28 @@ public class PWUENumberCalculator {
 
     private final Map<Integer, AtomicInteger> heightToPWUE = new ConcurrentHashMap<>(); // height to pwue nr
     private final Map<PancakeStackData, Integer> flippingOrderLengthMap = new ConcurrentHashMap<>(); // pancake stack to flipping order length
+    private final static Byte[][] cleanseOperations = new Byte[][]{
+            new Byte[]{}, // 0
+            new Byte[]{}, // 1
+            new Byte[]{}, // 2
+            new Byte[]{3, 2}, // 3
+            new Byte[]{3, 2, 2}, // 4
+            new Byte[]{4, 3, 3, 2}, // 5
+            new Byte[]{4, 3, 3, 2, 2}, // 6
+            new Byte[]{5, 4, 4, 3, 3, 2}, // 7
+            new Byte[]{5, 4, 4, 3, 3, 2, 2},// 8
+            new Byte[]{6, 5, 5, 4, 4, 3, 3, 2}, // 9
+            new Byte[]{6, 5, 5, 4, 4, 3, 3, 2, 2}, // 10
+            new Byte[]{7, 6, 6, 5, 5, 4, 4, 3, 3, 2}, // 11
+            new Byte[]{7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2}, // 12
+            new Byte[]{8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2} // 13
+    };
+
+
+    private int startedTasks = 0;
+    private final AtomicInteger finishedTasks = new AtomicInteger(0);
+    private final static int BATCH_SIZE = 10000;
+
 
     // bottom up pwue number generation
     public PancakeStackSortingResult calcPWUE(int height) {
@@ -56,15 +81,26 @@ public class PWUENumberCalculator {
         for (int i = 3; i <= height; i++) {
             // System.out.println("NOW GENERATING MAP FOR " + i);
             this.permute(i, i != height);
+            while (startedTasks - finishedTasks.get() != 0) {
+                try {
+                    System.out.println("waiting for " + (startedTasks - finishedTasks.get()) + " tasks");
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             // System.out.println(this.heightToPWUE);
             // System.out.println("pwue by height " + this.heightToPWUE);
             System.out.println(countPancakeStackEntriesByLength());
-            this.cleanse();
-            System.out.println(countPancakeStackEntriesByLength());
+            if (i != height) {
+                this.cleanse(i, height);
+                System.out.println(countPancakeStackEntriesByLength());
+            }
             // System.out.println(flippingOrderLengthMap);
         }
         return this.heightToPWUE.get(height).get();
     }
+
 
     private Map<Integer, Integer> countPancakeStackEntriesByLength() {
         Map<Integer, Integer> map = new HashMap<>();
@@ -77,20 +113,20 @@ public class PWUENumberCalculator {
         return map;
     }
 
-    private void cleanse() {
-        for (final Map.Entry<PancakeStackData, Integer> pancakeStackDataIntegerEntry : new HashSet<>(this.flippingOrderLengthMap.entrySet())) {
-            int entryHeight = pancakeStackDataIntegerEntry.getKey().getPancakes().length;
-            int entryValue = pancakeStackDataIntegerEntry.getValue();
+    private void cleanse(int current, int max) {
 
-            // System.out.println("trying to fetch " + entryHeight);
-            int pwue = this.heightToPWUE.get(entryHeight).get();
+        this.flippingOrderLengthMap.entrySet().removeIf(entry -> {
+            int entryHeight = entry.getKey().getPancakes().length;
+            int entryValue = entry.getValue();
 
-            // System.out.println(entryValue);
-            if (entryValue < pwue - 2) {
-                this.flippingOrderLengthMap.remove(pancakeStackDataIntegerEntry.getKey(), pancakeStackDataIntegerEntry.getValue());
-                // System.out.println(entryHeight + " : " + entryValue);
+            if (entryHeight <= current - 1) {
+                return true;
             }
-        }
+
+            int pwue = this.heightToPWUE.get(entryHeight).get();
+            return entryValue <= pwue - cleanseOperations[max][current - 1];
+        });
+
     }
 
     private void permute(int height, boolean writeToMap) {
@@ -114,27 +150,46 @@ public class PWUENumberCalculator {
             java.util.Collections.swap(pancakes, height, i);
         }
         if (height == pancakes.size() - 1) {
-            PancakeStack pancakeStack = new PancakeStack(pancakes.toArray(new Byte[0]));
-            Mono.fromCallable(() -> this.sort(pancakeStack, writeToMap))
-                    .subscribeOn(Schedulers.parallel())
-                    .doOnNext(requiredFlippingOperationsCount -> {
-                        if (requiredFlippingOperationsCount == -1) {
-                            return;
-                        }
-                        AtomicInteger currentWorstCase = heightToPWUE.getOrDefault(initialHeight, new AtomicInteger(Integer.MIN_VALUE));
-                        int currentWorstCaseValue = currentWorstCase.get();
-                        // System.out.println("current worst " + currentWorstCaseValue + " current required operations " + requiredFlippingOperationsCount);
-                        if (requiredFlippingOperationsCount <= currentWorstCaseValue) {
-                            return;
-                        }
-                        // System.out.println("current worst " + currentWorstCaseValue + " current required operations " + requiredFlippingOperationsCount);
-                        currentWorstCase.compareAndSet(currentWorstCaseValue, requiredFlippingOperationsCount);
-                        this.heightToPWUE.put(initialHeight, currentWorstCase);
-                        // System.out.println("added to pwue map key " + initialHeight + " value " + currentWorstCase.get());
-                        // System.out.println("pwue map " + heightToPWUE);
-                    }).subscribe();
 
+            PancakeStack pancakeStack = new PancakeStack(pancakes.toArray(new Byte[0]));
+            while (startedTasks - finishedTasks.get() > BATCH_SIZE) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                // TODO: 17.04.2023 this is very hacky
+            }
+            startedTasks++;
+            this.sortAndApplyResults(pancakeStack, writeToMap, height, initialHeight)
+                    .subscribeOn(Schedulers.parallel())
+                    .doOnNext(integer -> finishedTasks.incrementAndGet())
+                    .subscribe();
         }
+
+    }
+
+
+    private Mono<Integer> sortAndApplyResults(PancakeStack pancakeStack, boolean writeToMap, int height, int initialHeight) {
+        Mono<Integer> mono = !writeToMap && pancakeStack.getPancakes().getPancakes()[0] == height + 1 ?
+                Mono.just(-1) : Mono.just(this.sort(pancakeStack, writeToMap));
+        // System.out.println(Arrays.toString(pancakeStack.getPancakes().getPancakes()));
+        return mono.doOnNext(requiredFlippingOperationsCount -> {
+            if (requiredFlippingOperationsCount == -1) {
+                return;
+            }
+            AtomicInteger currentWorstCase = heightToPWUE.getOrDefault(initialHeight, new AtomicInteger(Integer.MIN_VALUE));
+            int currentWorstCaseValue = currentWorstCase.get();
+            // System.out.println("current worst " + currentWorstCaseValue + " current required operations " + requiredFlippingOperationsCount);
+            if (requiredFlippingOperationsCount <= currentWorstCaseValue) {
+                return;
+            }
+            // System.out.println("current worst " + currentWorstCaseValue + " current required operations " + requiredFlippingOperationsCount);
+            currentWorstCase.compareAndSet(currentWorstCaseValue, requiredFlippingOperationsCount);
+            this.heightToPWUE.put(initialHeight, currentWorstCase);
+            // System.out.println("added to pwue map key " + initialHeight + " value " + currentWorstCase.get());
+            // System.out.println("pwue map " + heightToPWUE);
+        });
     }
 
     public int sort(PancakeStack pancakeStack, boolean writeToMap) {
@@ -157,7 +212,9 @@ public class PWUENumberCalculator {
             this.pancakeFlipper.flip(clonedPancakeStack, i);
 
             if (clonedPancakeStack.isSolved()) {
+                // if (writeToMap) {
                 this.flippingOrderLengthMap.put(pancakeStack.getNormalizedPancakes(), 1);
+                // }
                 return 1;
             }
 

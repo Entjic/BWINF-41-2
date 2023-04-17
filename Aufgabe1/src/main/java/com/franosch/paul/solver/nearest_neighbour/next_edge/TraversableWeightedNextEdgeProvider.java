@@ -32,7 +32,7 @@ public class TraversableWeightedNextEdgeProvider {
             Integer numberOfRoutesOverA = graph.getNumberOfRoutes().get(nextA);
             Integer numberOfRoutesOverB = graph.getNumberOfRoutes().get(nextB);
 
-            return Double.compare(weightA * numberOfRoutesOverA, weightB + numberOfRoutesOverB);
+            return Double.compare(weightA * numberOfRoutesOverA, weightB * numberOfRoutesOverB);
 
         });
 

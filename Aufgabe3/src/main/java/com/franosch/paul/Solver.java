@@ -35,10 +35,10 @@ public class Solver {
         int pwue = sortingResult.getFlippingOrder().getFlippingOperations().size();
         System.out.println("PWUE of number " + number + " is " + pwue);
 
+        System.out.println("Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Wende-und-Essoperationen");
         for (final PancakeStackSortingResult pancakeStackSortingResult : result) {
-            System.out.println("Example worst case pancake stack " + Arrays.toString(pancakeStackSortingResult.getPrevious().getPancakes().getPancakes()));
-            System.out.println("Solved " + Arrays.toString(pancakeStackSortingResult.getSolved().getPancakes().getPancakes()));
-            System.out.println("Flippings operations to solve pancake stack " + pancakeStackSortingResult.getFlippingOrder().getFlippingOperations());
+            System.out.println("Example Worstcase Pancakestack");
+            this.printPancakeStackSortingResult(pancakeStackSortingResult);
         }
 
         System.out.println("Sorter map contains " + pancakeSorter.getMapEntryCount() + " entries");
@@ -48,14 +48,25 @@ public class Solver {
         return pwue;
     }
 
-
-    public void solveFile(int number, boolean useTestResources) {
+    public void solveFile(int number, boolean useTestResources, boolean printDebug) {
         PancakeFlipper pancakeFlipper = new PancakeFlipper();
         PancakeFlippingOrderApplier pancakeFlippingOrderApplier = new PancakeFlippingOrderApplier(pancakeFlipper);
         PancakeStackSorter pancakeSorter = new PancakeStackSorter(pancakeFlipper, pancakeFlippingOrderApplier);
         FileReader fileReader = new FileReader(useTestResources);
         PancakeStack pancakeStack = fileReader.read("pancake" + number);
-        pancakeSorter.sort(pancakeStack, true);
+        PancakeStackSortingResult sort = pancakeSorter.sort(pancakeStack, printDebug);
+        this.printPancakeStackSortingResult(sort);
+        System.out.println("Benötigte Wende-und-Essoperationen " + sort.getFlippingOrder().getFlippingOperations().size());
+
+
+    }
+
+    private void printPancakeStackSortingResult(PancakeStackSortingResult result){
+        System.out.println("Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen");
+        System.out.println(Arrays.toString(result.getPrevious().getPancakes().getPancakes()));
+        System.out.println(Arrays.toString(result.getSolved().getPancakes().getPancakes()));
+        System.out.println(Arrays.toString(result.getFlippingOrder().getFlippingOperations().toArray(new Byte[0])));
+
     }
 
 

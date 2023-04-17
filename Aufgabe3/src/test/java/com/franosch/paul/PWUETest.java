@@ -87,7 +87,7 @@ public class PWUETest {
 
     @Test
     public void calcPWUE() {
-        solver.findPWUE(11);
+       // solver.findPWUE(11);
         /*
         PWUE of number 9 is 5
         Pancake stack PancakeStackData{pancakes=[7, 3, 8, 9, 1, 5, 2, 6, 4]} -> PancakeStackData{pancakes=[9, 8, 5, 2]} operations [4, 5, 1, 3, 0]

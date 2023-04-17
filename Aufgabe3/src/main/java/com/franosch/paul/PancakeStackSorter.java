@@ -29,41 +29,14 @@ public class PancakeStackSorter {
     public PancakeStackSortingResult sort(PancakeStack pancakeStack) {
         FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
         PancakeStack solved = this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
-        // System.out.println(getMapEntryCount());
         return PancakeStackSortingResult.of(flippingOrder, solved, pancakeStack);
     }
 
-    public void printStats() {
-        Map<Integer, Integer> map = countPancakeStackEntriesByLength();
-
-        for (final Map.Entry<Integer, Integer> integerIntegerEntry : map.entrySet()) {
-            System.out.println("There are " + integerIntegerEntry.getValue() + " entries for keys with length " + integerIntegerEntry.getKey());
-        }
-    }
-
-    private Map<Integer, Integer> countPancakeStackEntriesByLength() {
-        Map<Integer, Integer> map = new HashMap<>();
-
-        for (final PancakeStackData pancakeStackData : flippingOrderMap.keySet()) {
-            Integer integer = map.getOrDefault(pancakeStackData.getPancakes().length, 0);
-            integer++;
-            map.put(pancakeStackData.getPancakes().length, integer);
-        }
-        return map;
-    }
-
-
     public PancakeStackSortingResult sort(PancakeStack pancakeStack, boolean debugPrints) {
-        if (!debugPrints) {
-            return this.sort(pancakeStack);
-        }
-        System.out.println("Input pancake stack " + pancakeStack.getNormalizedPancakes());
         FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
-        System.out.println("Shortest order of flipping operations with length " + flippingOrder.getFlippingOperations().size());
-        System.out.println("Order of operations " + flippingOrder.getFlippingOperations());
-        PancakeStack solved = this.pancakeFlippingOrderApplier.apply(pancakeStack, flippingOrder);
-        System.out.println("Resulting pancake stack " + solved);
-        System.out.println("Map entry count " + flippingOrderMap.size());
+        PancakeStack solved = debugPrints ?
+                this.pancakeFlippingOrderApplier.applyAndPrintDebug(pancakeStack.clone(), flippingOrder) :
+                this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
         return PancakeStackSortingResult.of(flippingOrder, solved, pancakeStack);
     }
 

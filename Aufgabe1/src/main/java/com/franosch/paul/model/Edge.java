@@ -17,10 +17,32 @@ public final class Edge {
         this.vectorTo = Vector.inverse(this.vectorFrom);
     }
 
+    public Node from() {
+        return from;
+    }
+
+    public Node to() {
+        return to;
+    }
+
+    public Double weight() {
+        return weight;
+    }
+
     public Node flip(Node current) {
         if (from.equals(current)) return to;
         if (to.equals(current)) return from;
         throw new IllegalArgumentException("Node " + current.id() + " is not part of edge " + this + " and can therefor not be used to flip!");
+    }
+
+    public Vector vector(Node base) {
+        if (base.equals(to())) {
+            return this.vectorTo;
+        }
+        if (base.equals(from())) {
+            return this.vectorFrom;
+        }
+        throw new IllegalArgumentException();
     }
 
     @Override
@@ -47,26 +69,7 @@ public final class Edge {
                 '}';
     }
 
-    public Node from() {
-        return from;
-    }
 
-    public Node to() {
-        return to;
-    }
 
-    public Double weight() {
-        return weight;
-    }
-
-    public Vector vector(Node base) {
-        if (base.equals(to())) {
-            return this.vectorTo;
-        }
-        if (base.equals(from())) {
-            return this.vectorFrom;
-        }
-        throw new IllegalArgumentException();
-    }
 
 }

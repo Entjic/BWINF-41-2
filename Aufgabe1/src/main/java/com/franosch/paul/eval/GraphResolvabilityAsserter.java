@@ -15,10 +15,7 @@ public class GraphResolvabilityAsserter {
     public boolean isSolvable(Graph graph) {
         for (final Node node : graph.getNodes().stream().sorted(Comparator.comparingInt(Node::id)).toList()) {
             boolean nodeSolvable = this.isNodeSolvable(graph, node);
-            int count = this.countValidConnectionsOverNode(graph, node);
-            System.out.println("node " + node.id() + " has " + count + " valid routes");
             if (!nodeSolvable) {
-                System.out.println("ey ich bin nicht lösbar");
                 return false;
             }
         }
@@ -41,22 +38,6 @@ public class GraphResolvabilityAsserter {
             return true;
         }
         return false;
-    }
-
-    public int countValidConnectionsOverNode(Graph graph, Node node) {
-        int counter = 0;
-
-        for (final Node from : graph.getNodes().stream().sorted(Comparator.comparingInt(Node::id)).toList()) {
-            if (from.equals(node)) {
-                continue;
-            }
-
-            Edge edge = graph.getEdge(from, node);
-
-            int size = this.getNextSize(graph, node, edge);
-            counter += size;
-        }
-        return counter;
     }
 
     private int getNextSize(Graph graph, Node current, Edge last) {

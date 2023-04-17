@@ -1,6 +1,7 @@
 package com.franosch.paul;
 
 import com.franosch.paul.eval.AngleCriteriaAsserter;
+import com.franosch.paul.eval.GraphResolvabilityAsserter;
 import com.franosch.paul.eval.PathPrinter;
 import com.franosch.paul.eval.SolutionEvaluator;
 import com.franosch.paul.model.Graph;
@@ -53,7 +54,6 @@ public class TravelingSalesmanSolver {
         pathPrinter.printPoints(path);
 
         Double evalNaive = solutionEvaluator.evaluate(graph, path);
-
 
 
         List<Node> best = Flux.range(1, 50)
@@ -128,6 +128,11 @@ public class TravelingSalesmanSolver {
 
     public double solve(int number, boolean useTestResources, SolvingStrategy solvingStrategy, PostOptimizationStrategy postOptimizationStrategy) {
         Graph graph = this.generateGraphFromFile(number, useTestResources);
+        GraphResolvabilityAsserter resolvabilityAsserter = new GraphResolvabilityAsserter();
+
+        if (!resolvabilityAsserter.isSolvable(graph)) {
+            throw new IllegalArgumentException("Der Graph ist nicht lösbar!");
+        }
 
         List<Node> solved = this.solveAndReturnPath(graph, solvingStrategy);
 

@@ -13,6 +13,12 @@ Zunächst wird eine initiale Lösung mittels der Nearest-Neighbour Heuristik erm
 Diese wird danach iterativ durch die TwoOpt-Postoptimierung verbessert.
 
 \subsection{Nearest-Neighbour Heuristik}\label{subsec:nearest-neighbour-heuristik}
+Die Eröffnungsheuristik ist vergleichsweise einfach.
+Es wird ausgehend eines Startknotens der Knoten gewählt, der die
+geringste Distanz zum aktuellen Knoten hat und der noch nicht besucht wurde.
+Anschließend wird der aktuelle Knoten zum Startknoten.
+Dieses Verfahren wird so lange wiederholt, bis alle Knoten besucht wurden.
+
 1.
 Zunächst wird ein Startknoten \textit{v}\textsubscript{Start} ermittelt.
 Ausgehend von \textit{v}\textsubscript{Start}, wird der Knoten \textit{v}\textsubscript{0} mit der geringsten Distanz gewählt.
@@ -22,18 +28,158 @@ Die Kante \textit{e} zwischen diesen beiden Knoten wird für die Suche des näch
 2.
 Solange es noch unbesuchte Knoten gibt, wird folgendes Verfahren wiederholt:
 Betrachte in aufsteigender Distanz zu \textit{v}\textsubscript{0} alle Knoten.
-Wenn die Kante, die den aktuell betrachteten Knoten und \textit{v}\textsubscript{0} verbindet \textit{e}
-in einem stumpfen Winkel schneidet
-Wähle unter allen nicht besuchten Knoten denjenigen Knoten \textit{v}, der die geringste Entfernung zu \textit{v}\textsubscript{0}
-hat und gleichzeitig dessen Kante zu \textit{v}\textsubscript{0} \textit{e} in einem stumpfen Winkel schneidet (Winkelbedingung).
-
-Ist es nicht möglich einen solchen Knoten zu finden, muss einen Schritt zurückgegangen werden und der
+Wenn die Kante, die den aktuell betrachteten Knoten und \textit{v}\textsubscript{0} verbindet, \textit{e}
+derart schneidet, dass die Winkelbedingung erfüllt ist, dann wähle diesen Knoten als nächsten \textit{v}\textsubscript{0}.
+Markiere \textit{v}\textsubscript{0} als besucht. \\
+Sollte kein solcher Knoten ermittelt werden können, gehe einen Schritt zurück und wähle den nächst-besten Knoten (Backtracking).
 
 \subsection{TwoOpt Postoptimierung}\label{subsec:twoopt-postoptimierung}
+Zugrundelegende Idee der Optimierung ist die Dreiecksungleichung.
+Diese besagt, dass eine Dreiecksseite höchstens so lang wie die Summe der beiden anderen Seiten ist.
+Höchstens ist dabei der Spezialfall, dass es sich um eine Gerade handelt.
+Konkret lässt sich daraus folgern, dass ein direkter Weg immer kürzer ist als über einen Umweg.
+Diese Eigenschaft wird sich in der Aufgabe zunutze gemacht, indem versucht wird die Reihenfolge der besuchten Knoten eines
+bereits gegeben Pfades derart zu Verändern, dass Überkreuzung reduziert werden.
+\begin{figure}[h]
+    \centering
+    \begin{minipage}[b]{0.3\textwidth}
+        \includegraphics[width=\textwidth]{2opt1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}[b]{0.26\textwidth}
+        \includegraphics[width=\textwidth]{2opt2}
+    \end{minipage}\label{fig:2opt}
+\end{figure}
+Die linke Graphik zeigt eine überkreuzte Tour.
+Die Kante 1--4 schneidet die Kante 3--2 im Punkt $P$.
+In der linken Abbildung werden je zwei Seiten der Dreiecke $\triangle{3P1}$ und $\triangle{42P}$ passiert.
+Dies kann unter berücksichtigung der Dreiecksungleichung optimiert werden, indem jeweils nur eine der Seiten traversiert wird.
+Die rechte Graphik zeigt wie die Tour dafür verändert werden muss.
+Die ursprüngliche Reihenfolge 6--3--2--8--7--1--4--5 wird zu 6--3--1--7--8--2--4--5.
+Durch beibehalten der Knoten und Umkehrung der Reihenfolge einer Teilroute,
+im Beispiel bleibt 6--3 und 4--5 erhalten und 2--8--7--1 wird zu 1--7--8--2, kann die Strecke der Gesamttour reduziert werden. \\
+Idealerweise werden alle Überkreuzungen innerhalb der Tour durch geschicktes Vertauschen entfernt.
+Dieser Ansatz findet allerdings nur ein lokales Minimum bezüglich der Strecke der Gesamttour.
+Möglicherweise muss zuerst eine Vertauschung vorgenommen werden, die die Gesamtstrecke erhöht, um
+danach in einen besseren Zustand als zuvor zu gelangen.
+Um das globale Minimum (oder wenigstens ein besonders gutes lokales Minimum) zu finden, wird der stochastische
+Optimierungsalgorithmus des Simulated Annealings verwendet.
+
+\subsection{Simulated Annealing}\label{subsec:simulated-annealing}
+Der Algorithmus ist von dem natürlichen Prozess des Abschreckens von Metallen inspiriert, genannt "annealing" auf
+Englisch, bei dem Metalle durch Erhitzen und langsames Abkühlen verfestigt werden.
+Es wird eine simulierte Temperatur $T$ eingeführt.
+Zunächst werden zwei Knoten der Tour zufällig gewählt.
+Sofern dabei nicht die Winkelbedingung verletzt wird, wird die Tour errechnet, welche entstehen würde,
+wenn die beiden Knoten vertauscht werden.
+Das heißt, die Teiltour, welche durch die beiden gewählten Knoten begrenzt wird, wird umgekehrt.
+Ist die resultierende Tour besser als die bisherige, so werden die Knoten vertauscht.
+Ist die Tour schlechter als die bisherige, so wird diese, sowohl abhängig von der
+aktuellen Temperatur $T$, als auch der absoluten Änderung der Länge, sowie Abhängig eines
+Zufallswertes entweder gewählt oder verworfen.
+Die Anzahl der erfolgten verbessernden oder verschlechternden Vertauschungen werden gezählt.
+Nach einer gewissen Zahl solcher Operationen wird $T$ abgekühlt (reduziert).
+Grundsätzlich gilt, eine höhere Temperatur erlaubt ungünstige Vertauschungen wahrscheinlicher als eine niedrige Temperatur.
+Diese Vorgehensweise erlaubt große Schwankungen am Anfang des Verfahrens, welche sich aber im Optimalfall um ein gutes
+Minimum gegen Ende einpendeln.
+Ausschlaggebend für die Ergebnisqualität sind die gewählten Parameter.
+Diese sind die Temperatur $T$, die Abkühlrate, die Anzahl der verbessernden Operationen bis zur Abkühlung sowie die Gesamtzahl
+an Operationen bis zur Abkühlung.
 
 
 \section{Umsetzung}\label{sec:umsetzung}
-Die Implementierung erfolgt in Java 17.
+Die Implementierung erfolgt in Java 17. \\
+Die Beispieldateien enthalten Punkte mit einer X- und Y-Koordinate.
+Anhand der Punkte wird ein vollständiger, ungerichteter, gewichteter Graph erstellt.
+Zur Berechnung der Kantengewichte muss die Distanz der Punkte zueinander ausgerechnet werden.
+Dies erfolgt, indem die Ortsvektoren der einzelnen Punkte gebildet werden, diese voneinander abgezogen werden, um die
+Verbindungsvektoren zu erhalten und anschlie{\ss}end den Betrag dieser zu errechnen.
+\begin{lstlisting}[label={lst:distance}]
+private Double length(Point a, Point b) {
+    return Math.sqrt((a.x() - b.x()) * (a.x() - b.x()) + (a.y() - b.y()) * (a.y() - b.y()));
+}
+\end{lstlisting}
+Um den ``Abbiege-Winkel'' an einem Knoten auszurechnen, wird der Schnittwinkel der beiden Richtungsvektoren der
+betrachteten anliegenden Kanten ausgerechnet.
+Ist dieser mindestens 90° gro{\ss}, so ist die Winkelbedingung erfüllt.
+\begin{lstlisting}[label={lst:vector-calc}]
+public static boolean matchesAngleCriteria(Vector first, Vector second) {
+    double degree = VectorCalculator.calcDegree(first, second);
+    return degree >= 90;
+}
+
+public static Double calcDegree(Vector a, Vector b) {
+    double dotProduct = a.x() * b.x() + a.y() * b.y();
+    double lengthA = length(a);
+    double lengthB = length(b);
+    return Math.toDegrees(Math.acos(dotProduct / (lengthA * lengthB)));
+}
+
+public static Double length(Vector vector) {
+    return Math.sqrt(vector.x() * vector.x() + vector.y() * vector.y());
+}
+\end{lstlisting}
+
+\subsection{Simulated Annealing}\label{subsec:simulated-annealing-implementation}
+Wie bereits beschrieben, hängt die Entscheidung, ob eine Vertauschung im betrachteten Pfad von verschiedenen Parametern ab.
+Konkret wird ein Zug welcher die Gesamtlänge der Tour um $d$ erhöht genau dann erlaubt,
+wenn $\mathrm{e}^{-d/T}$ grö{\ss}er ist als ein Zufallswert zwischen 0 und 1.
+Zum Vergleich, für $T=500$ verhält sich die Funktion wie folgt:
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|l|l|}
+        \hline
+        X & 50    & 200   & 350   & 500   & 650   & 800   & 950   \\ \hline
+        Y & 0,905 & 0,670 & 0,497 & 0,368 & 0,273 & 0,202 & 0,150 \\ \hline
+    \end{tabular}
+    \caption{Temperatur 500}
+    \label{tab:simulated-annealing}
+\end{table}
+Neben der Temperatur gibt es noch weitere Parameter.
+Diese beschreiben, wie und wie oft sich die Temperatur abkühlt.
+Die Funktion, welche das Abkühlverhalten der Temperatur beschreibt, ist in diesem Fall linear, könnte aber auch beliebig komplex sein.
+\begin{lstlisting}[label={lst:reduce-temperatur}]
+private void reduceTemperatur() {
+    this.temperatur = temperaturModifier * temperatur;
+}
+\end{lstlisting}
+Die Abkühlrate liegt typischerweise zwischen $0.9$ und $0,99$.
+Die letzten beiden Parameter bestimmen darüber, nach wie vielen Operationen die Temperatur abkühlt.
+$a$ meint die Anzahl der verbessernden Iterationen und $b$ meint die Anzahl der Iterationen insgesamt.\\
+Im Allgemeinen haben sich die Parameter $Starttemperatur = 100$ $Abk\ddot uhlrate = 0,9$ $a = 50$ $b = 100$ als gute
+Konfiguration erwiesen, die vergleichsweise gute Ergebnisse für beliebige Eingabe liefert. \\
+Da die Simulated Annealing Methode kein klar definiertes Ziel bzw.\ Ende besitzt wird das Verfahren über die Zeitdauer limitiert.
+Um das Problem, dass es sich um ein stochastisches Verfahren handelt und damit die Qualität der Lösung schwanken kann,
+zu entgehen, wird das Verfahren öfters für die gleiche Ausgangstour wiederholt.
+Um die Wartezeit zu reduzieren, wird der Prozess mittels der Reactive Streams
+Library\footnote{https://github.com/reactive-streams/reactive-streams-jvm} parallelisiert. \\
+
+\subsection{Komplexitätsbetrachtung}\label{subsec:komplexitatsbetrachtung}
+Eine optimale Lösung zu finden, würde bedeuten, alle Permutationen bestehend aus allen Knoten auszuprobieren.
+Für den ersten Knoten gibt es $n$ Möglichkeiten, für den zweiten $n - 1$ etc.
+Damit ergibt sich die Laufzeit $n!$.
+Im schlechtesten Fall muss die Nearest-Neighbour Heuristik, wie oben beschrieben, auch an jedem Knoten jeden noch nicht besuchten Knoten ausprobieren.
+Damit folgt für die Nearest-Neighbour Heuristik die Worst-Case-Laufzeit von $n!$.
+Tatsächlich findet der Algorithmus nahezu instantan eine Lösung.
+Eine Ausnahme hierbei stellt das Beispiel 5 dar.
+Für genaueres siehe~\ref{subsec:beispiel-5}. \\
+Um auch Beispiele wie Beispiel 5 lösen zu können, werden für jeden Knoten des Graphens die Anzahl der möglichen
+Vorgänger- und Nachfolgerkanten ermittelt, um diese im Zweifelsfall in die Auswahl des nächsten Knotens
+in der Nearest Neighbour Heuristik einfließen zu lassen.
+Das hat eine Laufzeit von $n^2$ \\
+Die Postoptimierung vertauscht Knoten in einer linearen Laufzeit.
+Die Laufzeit der 2opt-Optimierung ist unabhängig von der Größe des Graphens, lediglich die Parameter entscheiden über die
+Anzahl der Operationen.
+
+\subsection{Kann das Programm immer eine Lösung finden?}\label{subsec:losbarkeit}
+Bevor nach einer Route gesucht wird, werden alle Knoten dahingehend geprüft, ob es mindestens eine valide Kombination
+an anliegenden Kanten gibt, über welche der Knoten traversiert werden kann.
+Es darf maximal zwei Knoten geben, die diese Eigenschaft nicht besitzen.
+Diese zwei Knoten müssen Start- und Endknoten sein.
+Gibt es mehr als zwei solcher Knoten, ist es nicht möglich alle diese Knoten zu erreichen, und somit auch nicht möglich
+eine Lösung zu ermitteln.
+Ein Beispiel für einen solchen nicht lösbaren Graphen wäre Graph in welchem
+die drei äußersten Punkte ein gleichseitiges Dreieck bilden.
 
 
 \section{Beispiele}\label{sec:beispiele}
@@ -115,7 +261,7 @@ Je weniger solcher Pfade es gibt, desto höhere Priorität hat der Knoten in der
 Dieses Vorgehen erklärt die vergleichsweise schlechte initiale Lösung.
 Um so interessanter ist es, dass die Postoptimierung dennoch zu so einem guten Ergebnis führt. \\
 
-\begin{figure}[t]
+\begin{figure}[]
     \centering
     \begin{minipage}[b]{0.5\textwidth}
         \includegraphics[width=\textwidth]{naivwenigerkrumm5}
@@ -128,7 +274,7 @@ Um so interessanter ist es, dass die Postoptimierung dennoch zu so einem guten E
     \end{minipage}\label{fig:wenigerkrumm5}
 \end{figure}
 
-\begin{table}[b]
+\begin{table}[]
     \centering
     \begin{tabular}{|l|l|}
         \hline
@@ -146,6 +292,7 @@ Um so interessanter ist es, dass die Postoptimierung dennoch zu so einem guten E
     \label{tab:wenigerkrumm5}
 \end{table}
 \FloatBarrier
+
 \subsection{Beispiel 6}\label{subsec:beispiel-6}
 
 \begin{figure}[t]
