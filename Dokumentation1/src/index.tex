@@ -7,7 +7,7 @@
 \section{Lösungsidee}\label{sec:losungsidee}
 Das Problem der Aufgabenstellung beschreibt eine Variante des NP-vollständigen Traveling-Salesman Problems.
 Es ist somit nicht möglich optimale Lösungen in polynomieller Zeit für beliebige Graphen zu finden.
-Für die Graphen aus den Beispieldateien ist dies aufgrund ihrer Größe auch nicht möglich.
+Für die Graphen aus den Beispieldateien ist dies aufgrund ihrer Grö{\ss}e auch nicht möglich.
 Folglich müssen zur Bewältigung der Aufgabe Heuristiken herangezogen werden. \\
 Zunächst wird eine initiale Lösung mittels der Nearest-Neighbour Heuristik ermittelt.
 Diese wird danach iterativ durch die TwoOpt-Postoptimierung verbessert.
@@ -16,7 +16,7 @@ Diese wird danach iterativ durch die TwoOpt-Postoptimierung verbessert.
 Die Eröffnungsheuristik ist vergleichsweise einfach.
 Es wird ausgehend eines Startknotens der Knoten gewählt, der die
 geringste Distanz zum aktuellen Knoten hat und der noch nicht besucht wurde.
-Anschließend wird der aktuelle Knoten zum Startknoten.
+Anschlie{\ss}end wird der aktuelle Knoten zum Startknoten.
 Dieses Verfahren wird so lange wiederholt, bis alle Knoten besucht wurden.
 
 1.
@@ -72,7 +72,7 @@ Es wird eine simulierte Temperatur $T$ eingeführt.
 Zunächst werden zwei Knoten der Tour zufällig gewählt.
 Sofern dabei nicht die Winkelbedingung verletzt wird, wird die Tour errechnet, welche entstehen würde,
 wenn die beiden Knoten vertauscht werden.
-Das heißt, die Teiltour, welche durch die beiden gewählten Knoten begrenzt wird, wird umgekehrt.
+Das hei{\ss}t, die Teiltour, welche durch die beiden gewählten Knoten begrenzt wird, wird umgekehrt.
 Ist die resultierende Tour besser als die bisherige, so werden die Knoten vertauscht.
 Ist die Tour schlechter als die bisherige, so wird diese, sowohl abhängig von der
 aktuellen Temperatur $T$, als auch der absoluten Änderung der Länge, sowie Abhängig eines
@@ -80,7 +80,7 @@ Zufallswertes entweder gewählt oder verworfen.
 Die Anzahl der erfolgten verbessernden oder verschlechternden Vertauschungen werden gezählt.
 Nach einer gewissen Zahl solcher Operationen wird $T$ abgekühlt (reduziert).
 Grundsätzlich gilt, eine höhere Temperatur erlaubt ungünstige Vertauschungen wahrscheinlicher als eine niedrige Temperatur.
-Diese Vorgehensweise erlaubt große Schwankungen am Anfang des Verfahrens, welche sich aber im Optimalfall um ein gutes
+Diese Vorgehensweise erlaubt gro{\ss}e Schwankungen am Anfang des Verfahrens, welche sich aber im Optimalfall um ein gutes
 Minimum gegen Ende einpendeln.
 Ausschlaggebend für die Ergebnisqualität sind die gewählten Parameter.
 Diese sind die Temperatur $T$, die Abkühlrate, die Anzahl der verbessernden Operationen bis zur Abkühlung sowie die Gesamtzahl
@@ -165,10 +165,10 @@ Eine Ausnahme hierbei stellt das Beispiel 5 dar.
 Für genaueres siehe~\ref{subsec:beispiel-5}. \\
 Um auch Beispiele wie Beispiel 5 lösen zu können, werden für jeden Knoten des Graphens die Anzahl der möglichen
 Vorgänger- und Nachfolgerkanten ermittelt, um diese im Zweifelsfall in die Auswahl des nächsten Knotens
-in der Nearest Neighbour Heuristik einfließen zu lassen.
+in der Nearest Neighbour Heuristik einflie{\ss}en zu lassen.
 Das hat eine Laufzeit von $n^2$ \\
 Die Postoptimierung vertauscht Knoten in einer linearen Laufzeit.
-Die Laufzeit der 2opt-Optimierung ist unabhängig von der Größe des Graphens, lediglich die Parameter entscheiden über die
+Die Laufzeit der 2opt-Optimierung ist unabhängig von der Grö{\ss}e des Graphens, lediglich die Parameter entscheiden über die
 Anzahl der Operationen.
 
 \subsection{Kann das Programm immer eine Lösung finden?}\label{subsec:losbarkeit}
@@ -179,7 +179,7 @@ Diese zwei Knoten müssen Start- und Endknoten sein.
 Gibt es mehr als zwei solcher Knoten, ist es nicht möglich alle diese Knoten zu erreichen, und somit auch nicht möglich
 eine Lösung zu ermitteln.
 Ein Beispiel für einen solchen nicht lösbaren Graphen wäre Graph in welchem
-die drei äußersten Punkte ein gleichseitiges Dreieck bilden.
+die drei äu{\ss}ersten Punkte ein gleichseitiges Dreieck bilden.
 
 
 \section{Beispiele}\label{sec:beispiele}
@@ -362,6 +362,591 @@ Um so interessanter ist es, dass die Postoptimierung dennoch zu so einem guten E
 
 
 \section{Quellcode}\label{sec:quellcode}
-Unwichtige Teile des Programms sollen hier nicht abgedruckt werden.
-Dieser Teil sollte nicht mehr als 2–3 Seiten umfassen, maximal 10.
+\begin{lstlisting}[label={lst:source}]
+public class VectorCalculator {
+
+    public static boolean matchesAngleCriteria(Vector first, Vector second) {
+        double degree = VectorCalculator.calcDegree(first, second);
+        return degree >= 90;
+    }
+
+    public static Double calcDegree(Vector a, Vector b) {
+        double dotProduct = a.x() * b.x() + a.y() * b.y();
+        double lengthA = length(a);
+        double lengthB = length(b);
+        return Math.toDegrees(Math.acos(dotProduct / (lengthA * lengthB)));
+    }
+
+    public static Double length(Vector vector) {
+        return Math.sqrt(vector.x() * vector.x() + vector.y() * vector.y());
+    }
+}
+
+    public ParameterConfiguration findGoodParameter(Graph graph, List<Node> path) {
+
+        SolutionEvaluator solutionEvaluator = new SolutionEvaluator();
+        System.out.println("naiv solution " + solutionEvaluator.evaluate(graph, path));
+        PathPrinter pathPrinter = new PathPrinter();
+        pathPrinter.print(path);
+        pathPrinter.printPoints(path);
+        Set<ParameterConfiguration> parameterConfigurations = this.generateAllParameterConfigurations();
+
+        final int iterations = 5;
+        final long timeLimit = 10000;
+
+        System.out.println("iterations " + iterations);
+        System.out.println("length " + parameterConfigurations.size());
+        System.out.println("iterations * length " + iterations * parameterConfigurations.size());
+
+        final int cores = Runtime.getRuntime().availableProcessors();
+
+        System.out.println("available cores " + cores);
+
+        double seconds = iterations * parameterConfigurations.size() * timeLimit / 1000.0;
+        System.out.println("estimated time in seconds without multithreading " + seconds);
+        System.out.println("estimated time in minutes without multithreading " + seconds / 60.0);
+        System.out.println("estimated time in hours without multithreading " + seconds / 3600.0);
+
+        seconds = seconds / cores;
+
+        System.out.println("estimated time in seconds using multithreading " + seconds);
+        System.out.println("estimated time in minutes using multithreading " + seconds / 60.0);
+        System.out.println("estimated time in hours using multithreading " + seconds / 3600.0);
+
+
+        final Map<ParameterConfiguration, ParameterTestResult> results = Flux.fromIterable(parameterConfigurations)
+                .parallel()
+                .flatMap(parameterConfiguration -> Mono.fromCallable(() -> {
+                    // System.out.println("now testing " + parameterConfiguration);
+                    ParameterTestResult result = test(parameterConfiguration, solutionEvaluator, graph, path, iterations, timeLimit);
+                    // System.out.println("finished testing " + parameterConfiguration);
+                    return Tuples.of(parameterConfiguration, result);
+                }).subscribeOn(Schedulers.parallel()))
+                .sequential()
+                .collectMap(Tuple2::getT1, Tuple2::getT2)
+                .block();
+
+        String date = Instant.now().toString();
+
+        this.saveBestResults(results, graph, date);
+
+        return this.findBestByAverage(results, 1).stream().findAny().map(Map.Entry::getKey).orElseThrow();
+    }
+
+        @Override
+    public List<Node> solve(final Graph graph, Node start) {
+        traverse(graph, start);
+
+        return solution;
+    }
+
+    @Override
+    public SolvingStrategy getSolvingStrategy() {
+        return SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC;
+    }
+
+
+    private void traverse(Graph graph, Node start) {
+        this.traverse(graph, new HashSet<>(graph.getNodes()), start, null, new ArrayList<>());
+    }
+
+    private void traverse(Graph graph, Set<Node> open, Node current, Edge last, List<Node> path) {
+        if (solutionFound) {
+            return;
+        }
+        path.add(current);
+        open.remove(current);
+        if (open.isEmpty()) {
+            solutionFound = true;
+            solution = path;
+            return;
+        }
+
+        List<Edge> possibleNext = this.weightedNextEdgeProvider.calcPossibleNext(graph, current, last, open);
+
+        for (final Edge edge : possibleNext) {
+            Node next = edge.flip(current);
+            traverse(graph, new HashSet<>(open), next, edge, new ArrayList<>(path));
+        }
+    }
+
+public class AngleCriteriaNextEdgeProvider {
+
+    public Set<Edge> getNext(Graph graph, Node current, Edge last) {
+        final Set<Edge> set = new HashSet<>();
+        for (final Edge next : graph.getNeighbouringEdges().get(current)) {
+            if (last.equals(next)) {
+                continue;
+            }
+            if (VectorCalculator.matchesAngleCriteria(last.vector(current), next.vector(current))) {
+                set.add(next);
+            }
+        }
+        return set;
+    }
+
+}
+
+
+@RequiredArgsConstructor
+public class WeightedNextEdgeProvider {
+
+    private final AngleCriteriaNextEdgeProvider nextEdgeProvider;
+
+    public List<Edge> calcPossibleNext(Graph graph, Node current, Edge last, Set<Node> open) {
+        List<Edge> possibleNext;
+
+        if (last == null) {
+            possibleNext = new ArrayList<>(graph.getNeighbouringEdges().get(current));
+        } else {
+            possibleNext = new ArrayList<>(this.nextEdgeProvider.getNext(graph, current, last));
+        }
+
+        possibleNext.sort(Comparator.comparingDouble(Edge::weight));
+
+        List<Edge> result = new ArrayList<>();
+
+        for (final Edge edge : possibleNext) {
+            Node next = edge.flip(current);
+            if (open.contains(next)) {
+                result.add(edge);
+            }
+        }
+
+        return result;
+
+    }
+
+
+}
+
+
+@RequiredArgsConstructor
+public class NearestNeighbourHeuristic implements Solver {
+
+
+    private boolean solutionFound = false;
+
+    private List<Node> solution = null;
+
+    private final WeightedNextEdgeProvider weightedNextEdgeProvider;
+
+    @Override
+    public List<Node> solve(final Graph graph, Node start) {
+        traverse(graph, start);
+
+        return solution;
+    }
+
+    @Override
+    public SolvingStrategy getSolvingStrategy() {
+        return SolvingStrategy.NEAREST_NEIGHBOUR_HEURISTIC;
+    }
+
+
+    private void traverse(Graph graph, Node start) {
+        this.traverse(graph, new HashSet<>(graph.getNodes()), start, null, new ArrayList<>());
+    }
+
+    private void traverse(Graph graph, Set<Node> open, Node current, Edge last, List<Node> path) {
+        if (solutionFound) {
+            return;
+        }
+        path.add(current);
+        open.remove(current);
+        if (open.isEmpty()) {
+            solutionFound = true;
+            solution = path;
+            return;
+        }
+
+        List<Edge> possibleNext = this.weightedNextEdgeProvider.calcPossibleNext(graph, current, last, open);
+
+        for (final Edge edge : possibleNext) {
+            Node next = edge.flip(current);
+            traverse(graph, new HashSet<>(open), next, edge, new ArrayList<>(path));
+        }
+    }
+
+
+}
+
+
+/**
+ * swap cities using simulated annealing to allow worsening swaps
+ * this hopefully evades local minima
+ */
+@RequiredArgsConstructor
+public class TwoOptPostOptimization implements PostOptimization {
+
+    private final static ParameterConfiguration DEFAULT_CONFIGURATION =
+            new ParameterConfiguration(100.0,
+                    0.9,
+                    50,
+                    100);
+
+    private final SolutionEvaluator solutionEvaluator;
+    private final double temperaturModifier;
+    private final int improvingIterationsUntilCooling;
+    private final int iterationsUntilCooling;
+    private double temperatur;
+
+
+    public TwoOptPostOptimization(SolutionEvaluator solutionEvaluator) {
+        this(solutionEvaluator, DEFAULT_CONFIGURATION);
+    }
+
+    public TwoOptPostOptimization(SolutionEvaluator solutionEvaluator,
+                                  ParameterConfiguration configuration) {
+        this.solutionEvaluator = solutionEvaluator;
+        this.temperatur = configuration.startingTemperature();
+        this.temperaturModifier = configuration.temperaturModifier();
+        this.improvingIterationsUntilCooling = configuration.improvingIterationsUntilCooling();
+        this.iterationsUntilCooling = configuration.iterationsUntilCooling();
+    }
+
+    @Override
+    public List<Node> optimize(final Graph graph, final List<Node> tour, long timeLimit) {
+        // TODO: 29.03.2023 optimize data structure of tour
+
+        List<Node> current = new ArrayList<>(tour);
+
+        double currentLength = solutionEvaluator.evaluate(graph, current);
+
+        int improvingIterations = 0;
+        int iterations = 0;
+        long stopAfterTimeLimit = System.currentTimeMillis() + timeLimit;
+
+        while (System.currentTimeMillis() < stopAfterTimeLimit) {
+            ResultType improved = this.improve(graph, current, stopAfterTimeLimit);
+            // double nextLength = solutionEvaluator.evaluate(graph, current);
+            // System.out.println("improvement of " + (currentLength - nextLength));
+            // currentLength = nextLength;
+            if (improvingIterations == improvingIterationsUntilCooling) {
+                improvingIterations = 0;
+                iterations = 0;
+                this.reduceTemperatur();
+            }
+            if (iterations == iterationsUntilCooling) {
+                improvingIterations = 0;
+                iterations = 0;
+                this.reduceTemperatur();
+            }
+            // System.out.println("t " + temperatur);
+            if (improved.equals(ResultType.ZERO)) {
+                continue;
+            }
+            iterations++;
+            if (improved.equals(ResultType.BETTER)) {
+                improvingIterations++;
+            }
+        }
+        return current;
+    }
+
+    private ResultType improve(Graph graph, List<Node> current, long timeLimit) {
+        while (System.currentTimeMillis() < timeLimit) {
+
+            int first = this.randomInRange(0, current.size() - 4);
+            int second = this.randomInRange(first + 2, current.size() - 1);
+
+            Node prevFirstNode = first == 0 ? null : current.get(first - 1);
+            Node firstNode = current.get(first);
+            Node postFirstNode = current.get(first + 1);
+            Node postPostFirstNode = current.get(first + 2);
+
+            Node prevSecondNode = current.get(second - 1);
+            Node secondNode = current.get(second);
+            Node postSecondNode = second == current.size() - 1 ? null : current.get(second + 1);
+            Node postPostSecondNode = second >= current.size() - 2 ? null : current.get(second + 2);
+
+            Edge a = prevFirstNode == null ? null : graph.getEdge(prevFirstNode, firstNode);
+            Edge insertedEdgeOne = graph.getEdge(firstNode, secondNode);
+            Edge insertedEdgeTwo = postSecondNode == null ? null : graph.getEdge(postFirstNode, postSecondNode);
+            Edge d = graph.getEdge(prevSecondNode, secondNode);
+            Edge e = graph.getEdge(postFirstNode, postPostFirstNode);
+            Edge f = postPostSecondNode == null ? null : graph.getEdge(postSecondNode, postPostSecondNode);
+
+            if (doesNotMatchAngleCriteria(a, insertedEdgeOne)) {
+                continue;
+            }
+
+            if (doesNotMatchAngleCriteria(insertedEdgeOne, d)) {
+                continue;
+            }
+
+            if (doesNotMatchAngleCriteria(e, insertedEdgeTwo)) {
+                continue;
+            }
+
+            if (doesNotMatchAngleCriteria(insertedEdgeTwo, f)) {
+                continue;
+            }
+
+            Edge b = graph.getEdge(secondNode, postSecondNode);
+            Edge c = graph.getEdge(firstNode, postFirstNode);
+
+            double difference = -c.weight() - b.weight() + insertedEdgeOne.weight() + insertedEdgeTwo.weight();
+
+            if (difference < 0) {
+                twoOptSwap(current, first, second);
+                return ResultType.BETTER;
+            }
+
+            if (difference == 0) {
+                continue;
+            }
+
+            if (allowWorseningSwap(difference)) {
+                twoOptSwap(current, first, second);
+                return ResultType.WORSE;
+            }
+        }
+        return ResultType.ZERO;
+    }
+
+    private int randomInRange(int from, int to) {
+
+        if (from > to) {
+            throw new IllegalArgumentException("from " + from + " > to " + to);
+        }
+
+        if (from == to) {
+            return from;
+        }
+
+        int out = (int) (Math.random() * (to - from));
+        out += from;
+        // System.out.println("out " + (out) + " in range " + from + " to " + to);
+        return out;
+    }
+
+    private boolean doesNotMatchAngleCriteria(Edge a, Edge b) {
+        if (a == null || b == null) {
+            return false;
+        }
+        if (a.from().equals(b.from())) {
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.from()), b.vector(a.from()));
+        }
+        if (a.to().equals(b.to())) {
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.to()), b.vector(a.to()));
+        }
+        if (a.to().equals(b.from())) {
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.to()), b.vector(a.to()));
+        }
+        if (a.from().equals(b.to())) {
+            return !VectorCalculator.matchesAngleCriteria(a.vector(a.from()), b.vector(a.from()));
+        }
+        throw new IllegalArgumentException();
+    }
+
+    /**
+     * only call if swap would make the tour longer
+     *
+     * @param difference current length - prev length
+     * @return true if swap is allowed event though it worsens the length of the tour
+     */
+    private boolean allowWorseningSwap(double difference) {
+        double random = Math.random();
+        double exp = Math.exp((-difference) / temperatur);
+
+        return exp > random;
+    }
+
+
+    private void twoOptSwap(List<Node> tour, int first, int second) {
+        List<Node> firstToSecond = tour.subList(first + 1, second + 1);
+
+        Collections.reverse(firstToSecond);
+    }
+
+    private enum ResultType {
+        ZERO,
+        BETTER,
+        WORSE
+    }
+
+    private void reduceTemperatur() {
+        this.temperatur = temperaturModifier * temperatur;
+    }
+
+}
+
+
+public record Vector(double x, double y) {
+
+    public static Vector of(Edge edge) {
+        Point from = edge.from().point();
+        Point to = edge.to().point();
+        double x = to.x() - from.x();
+        double y = to.y() - from.y();
+        return new Vector(x, y);
+    }
+
+    public static Vector inverse(Vector vector) {
+        return new Vector(-vector.x(), -vector.y());
+    }
+
+}
+
+
+public record Point(Double x, Double y) {
+}
+
+
+public record Node(int id, Point point) {
+}
+
+public final class Edge {
+    private final Node from;
+    private final Node to;
+    private final Double weight;
+    private final Vector vectorFrom;
+    private final Vector vectorTo;
+
+    public Edge(Node from, Node to, Double weight) {
+        this.from = from;
+        this.to = to;
+        this.weight = weight;
+        this.vectorFrom = Vector.of(this);
+        this.vectorTo = Vector.inverse(this.vectorFrom);
+    }
+
+    public Node from() {
+        return from;
+    }
+
+    public Node to() {
+        return to;
+    }
+
+    public Double weight() {
+        return weight;
+    }
+
+    public Node flip(Node current) {
+        if (from.equals(current)) return to;
+        if (to.equals(current)) return from;
+        throw new IllegalArgumentException("Node " + current.id() + " is not part of edge " + this + " and can therefor not be used to flip!");
+    }
+
+    public Vector vector(Node base) {
+        if (base.equals(to())) {
+            return this.vectorTo;
+        }
+        if (base.equals(from())) {
+            return this.vectorFrom;
+        }
+        throw new IllegalArgumentException();
+    }
+}
+
+
+@Getter
+public class Graph {
+
+    private final Set<Node> nodes;
+    private final Set<Edge> edges;
+    private final Map<Node, Set<Node>> neighbours;
+    private final Map<Node, Set<Edge>> neighbouringEdges;
+    private final Map<Node, Integer> numberOfRoutes;
+
+    public Graph(final Set<Node> nodes, final Set<Edge> edges) {
+        this.nodes = nodes;
+        this.edges = edges;
+        this.neighbours = this.calcNeighbours(nodes, edges);
+        this.neighbouringEdges = this.calcNeighbouringEdges(nodes, edges);
+        this.numberOfRoutes = this.calcNumberOfRoutes();
+    }
+
+
+    private Map<Node, Set<Edge>> calcNeighbouringEdges(final Set<Node> nodes, final Set<Edge> edges) {
+        Map<Node, Set<Edge>> map = new HashMap<>();
+        for (final Node node : nodes) {
+            Set<Edge> set = new HashSet<>();
+            for (final Edge edge : edges) {
+                if (edge.from().equals(node) || edge.to().equals(node)) {
+                    set.add(edge);
+                }
+            }
+            map.put(node, set);
+        }
+        return map;
+    }
+
+    private Map<Node, Set<Node>> calcNeighbours(Set<Node> nodes, Set<Edge> edges) {
+        Map<Node, Set<Node>> map = new HashMap<>();
+        for (Node node : nodes) {
+            Set<Node> set = new HashSet<>();
+            for (Edge edge : edges) {
+                if (edge.from().equals(node)) {
+                    set.add(edge.to());
+                }
+            }
+            map.put(node, set);
+        }
+        return map;
+    }
+
+    public Edge getEdge(Node from, Node to) {
+        for (final Edge edge : this.getNeighbouringEdges().get(from)) {
+            if (edge.from().equals(from) && edge.to().equals(to) || edge.to().equals(from) && edge.from().equals(to)) {
+                return edge;
+            }
+        }
+        System.out.println("smth went wrong finding an edge between node " + from + " and " + to);
+        return null;
+    }
+
+    public Node getNodeById(int id) {
+        return this.nodes.stream().filter(node -> node.id() == id).findAny().orElseThrow();
+    }
+
+    private Map<Node, Integer> calcNumberOfRoutes() {
+        Map<Node, Integer> result = new HashMap<>();
+        for (final Node node : this.nodes) {
+            int i = this.countValidConnectionsOverNode(node);
+            result.put(node, i);
+        }
+        return result;
+    }
+
+    private int countValidConnectionsOverNode(Node node) {
+        int counter = 0;
+
+        for (final Node from : this.getNodes().stream().sorted(Comparator.comparingInt(Node::id)).toList()) {
+            if (from.equals(node)) {
+                continue;
+            }
+
+            Edge edge = this.getEdge(from, node);
+
+            int size = this.getNextSize(node, edge);
+            counter += size;
+        }
+        return counter;
+    }
+
+    private int getNextSize(Node current, Edge last) {
+        int counter = 0;
+        for (final Edge next : this.getNeighbouringEdges().get(current)) {
+            if (next.equals(last)) {
+                continue;
+            }
+            if (VectorCalculator.matchesAngleCriteria(last.vector(current), next.vector(current))) {
+                counter += 1;
+            }
+        }
+        return counter;
+    }
+
+    public Node findStartNode(){
+        return this.getNodes().stream().filter(node -> node.id() == 0).findAny().orElseThrow();
+
+    }
+
+
+}
+
+\end{lstlisting}
 

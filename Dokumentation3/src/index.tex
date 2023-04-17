@@ -5,65 +5,134 @@
 
 
 \section{Lösungsidee}\label{sec:losungsidee}
-Um Pfandkuchenstapel zu sortieren, wird die Technik des Dynamic Programmings verwendet.
-Idee ist es, das Problem, also den zu sortierenden Pfandkuchenstapel, in identische Teilprobleme zu zerlegen.
+Im Nachfogeldenen meint ein Sortierter Pfannkuchenstapel einen
+Pfannkuchenstapel bei dem der grö{\ss}te Pfannkuchen ganz unten,
+der zweitgrö{\ss}te darüber etc. liegt. \\
+\subsection{Pfannkuchen-Sortierer}\label{subsec:pfannkuchen-sortierer}
+Um Pfannkuchenstapel zu sortieren, wird die Technik des Dynamic Programmings verwendet.
+Idee ist es, das Problem, also den zu sortierenden Pfannkuchenstapel, in identische Teilprobleme zu zerlegen.
 Im Kontext der Aufgabe bedeutet das, an allen möglichen Indizes die Wende-und-Essoperation beginnen zu lassen.
 Der jeweilige Index der Wende-und-Essoperation wird gemerkt.
-Dieses Verfahren wird so lange wiederholt, bis der Pfandkuchenstapel sortiert ist.
-Die möglichen Abfolgen von Wende-und-Essoperationen zur Sortierung eines Pfandkuchenstapels werden gesammelt
+Nach jeder Wende-und-Essoperation wird der resultierende Pfandkuchen gemä{\ss} seiner neuen Höhe normiert.
+Das bedeutet alle Pfandkuchen, die grö{\ss}er als der gegessen Pfandkuchen sind, werden in ihrer Grö{\ss}e um eins reduziert.
+Damit ist gewährleistet, dass ein Pfannkuchenstapel [9,3,7] genauso behandelt werden kann wie der Stapel [3,1,2].
+Dieses Verfahren wird so lange wiederholt, bis der Pfannkuchenstapel sortiert ist.
+Die möglichen Abfolgen von Wende-und-Essoperationen zur Sortierung eines Pfannkuchenstapels werden gesammelt
 und abschlie{\ss}end derjenige gewählt, der die wenigsten Wende-und-Essoperationen benötigt.
-Danach wird der aktuelle Pfandkuchenstapel und die jeweilige beste gefundene Lösung gemerkt.
-Zu Beginn eines jeden Rekursionsschritts wird überprüft, ob nicht genau dieser Pfandkuchenstapel bereits gelöst wurde.
-Ist der Pfandkuchenstapel bereits gelöst worden, so wird darauf verzichtet diesen wieder in alle möglichen Pfandkuchenstapel
-aufzuteilen und es wird direkt die Zugfolge des gelösten Pfandkuchenstapels verwendet. \\
+Danach wird der aktuelle Pfannkuchenstapel und die jeweilige beste gefundene Lösung gemerkt.
+Zu Beginn eines jeden Rekursionsschritts wird überprüft, ob nicht genau dieser Pfannkuchenstapel bereits gelöst wurde.
+Ist der Pfannkuchenstapel bereits gelöst worden, so wird darauf verzichtet diesen wieder in alle möglichen Pfannkuchenstapel
+aufzuteilen und es wird direkt die Zugfolge des gelösten Pfannkuchenstapels verwendet. \\
 Dieses Verfahren garantiert einerseits, dass die Zugfolge optimal kurz ist, und zugleich nicht unnötig
-oft derselbe Pfandkuchenstapel gelöst wird. \\
-Um die PWUE-Zahl einer Pfandkuchenstapelhöhe zu generieren, müssen alle Pfandkuchenstapel der besagten Höhe generiert,
+oft derselbe Pfannkuchenstapel gelöst wird. \\
+\subsection{PWUE-Zahlen}\label{subsec:pwue-zahlen}
+Um die PWUE-Zahl einer Pfannkuchenstapelhöhe zu generieren, müssen alle Pfannkuchenstapel der besagten Höhe generiert,
 sortiert und abschlie{\ss}end bezüglich der Länge ihrer Zugfolge evaluiert werden.
-Problematisch hierbei ist die schiere Menge der zu prüfenden Pfandkuchenstapel, sowie die Menge der Einträge, die
+Problematisch hierbei ist die schiere Menge der zu prüfenden Pfannkuchenstapel, sowie die Menge der Einträge, die
 infolge des Dynamic Programming Ansatzes, gemerkt werden müssen. \\
-Für die Anzahl der zu prüfenden Pfandkuchenstapel gilt $h!$ wobei $h$ die Höhe der betrachteten Pfandkuchenstapel ist.
-Um die zu merkende Datenmenge zu reduzieren, wird die Art und Weise wie Pfandkuchenstapel gelöst werden modifiziert.
+Für die Anzahl der zu prüfenden Pfannkuchenstapel gilt $h!$ wobei $h$ die Höhe der betrachteten Pfannkuchenstapel ist.
+Um die zu merkende Datenmenge zu reduzieren, wird die Art und Weise wie Pfannkuchenstapel gelöst werden modifiziert.
 Ziel ist es nun nicht mehr, die Zugfolge zu finden, sondern lediglich die Anzahl der nötigen Wende-und-Essoperationen.
 Zudem werden die PWUE-Zahlen dynamisch generiert.
 Sucht man also bspw.\ die PWUE-Zahl der Höhe 7, so wird zunächst die PWUE-Zahl der Höhe 1, dann 2, dann 3, etc.\ generiert,
-und dementsprechend auch alle Pfandkuchenstapel der Höhe 1, 2, 3 etc.
-Dieser Bottom-Up Ansatz hat den Vorteil, dass man sich sicher sein kann, dass alle Pfandkuchenstapel der vorherigen
+und dementsprechend auch alle Pfannkuchenstapel der Höhe 1, 2, 3 etc.
+Dieser Bottom-Up Ansatz hat den Vorteil, dass man sich sicher sein kann, dass alle Pfannkuchenstapel der vorherigen
 Höhen bereits gelöst wurden.
 Das eröffnet die Möglichkeit Einträge gezielt nicht zu merken.
+Darauf wird genau dann verzichtet, wenn die Lösung des aktuellen Pfannkuchenstapels derart trivial ist, dass absehbar ist, dass
+darauf aufbauende Pfannkuchenstapel (also solche, die dem aktuellen Pfannkuchen nach einer Wende-und-Essoperation entsprechen)
+nicht zu einer PWUE-Zahl führen werden.
+Beispielsweise 7 hohe Pfannkuchenstapel, welche in einer oder zwei Pfannkuchen Wende-und-Essoperation gelöst werden können.
 Im vorher verwendeten Top-Down Ansatz würde man bei fehlenden Einträgen davon ausgehen, dass diese schlicht noch nicht
 berechnet wurden und deswegen fehlen.
 Jetzt kann aber davon ausgegangen werden, dass diese absichtlich fehlen,
-schlie{\ss}lich wurden ja alle vorherigen Pfandkuchenstapel gelöst.
+schlie{\ss}lich wurden ja alle vorherigen Pfannkuchenstapel gelöst.
 Dadurch kann durch die \textit{Absenz von Einträgen} Information ausgedrückt werden, ohne kostbaren Speicher aufzuwenden.
-Konkret werden, nachdem die PWUE-Zahl einer Zahl $n$ ermittelt wurde, alle Einträge gelöscht, welche eine so kurze Zugfolge
+Konkret werden, alle Einträge von $n - 1$ gelöscht.
+\subsection{13er PWUE-Zahl}\label{subsec:13er-pwue-zahl}
+Für PWUE-Zahlen kleiner gleich 12 reicht das bis hierhin beschriebene Verfahren aus.
+Für die PWUE-Zahl 13 wurde folgende Optimierung versucht.
+Nachdem die PWUE-Zahl einer Zahl $n$ ermittelt wurde, werden alle Einträge gelöscht, welche eine so kurze Zugfolge
 aufweisen, sodass sie für die PWUE-Zahl von $n + 1$ nicht relevant sind.
-Die Zugfolge ist genau dann zu kurz, wenn sie kleiner als $n - 2$ ist.
-Beim Lösen eines Pfandkuchenstapels der Höhe $n$ werden nun alle Pfandkuchenstapel erzeugt,
-welche durch eine einzige Wende-und-Essoperation erreichbar sind.
-Diese haben demnach die Höhe $n - 1$.
-Ist einer der resultierenden Pfandkuchenstapel nicht gemerkt, so kann davon ausgegangen werden, dass der ursprüngliche
-Pfandkuchen auch nicht relevant für die PWUE-Betrachtung ist, weil er genau einen Zug
-mehr braucht als ein Stapel der weniger als $PWUE(n - 1) - 2$ Operationen benötigt.
-Der ursprüngliche Pfandkuchen braucht in dem Fall also maximal $PWUE(n - 1) - 2$ Operationen um sortiert zu werden.
-Da $PWUE(n + 1) >= PWUE(n)$ muss $PWUE(n) >= PWUE(n - 1)$ gelten.
-Um einen Einfluss auf $PWUE(n)$ zu nehmen muss die Anzahl
+Die Zugfolge ist genau dann zu kurz, wenn sie kleiner gleich $PWUE(n) - k$ ist.
+K wird im nächsten Absatz genauer erklärt, zwischengeschoben folgende Überlegung. \\
+Angenommen es existiert $PWUE(n + 1) < PWUE(n)$, dann wäre man in der Lage einen Pfannkuchenstapel der
+Höhe $n + 1$ zu konstruieren, welcher aus einem worst-case Pfannkuchenstapel der Höhe $n$ besteht
+und zusätzlich seinen grö{\ss}ten Pfannkuchen ganz unten hat.
+Somit existiert ein Pfannkuchenstapel der Höhe $n + 1$ mit $PWUE(n)$ benötigten Wende-und-Essoperationen, was ein
+Widerspruch zu der Annahme wäre.
+Daraus folgt, dass $PWUE(n + 1) >= PWUE(n)$ gilt. \\
+Betrachtet wird das Beispiel der PWUE-Zahl von 10.
+In früheren Schritten wurden kleinere PWUE-Zahlen ermittelt.
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+        \hline
+        Höhe & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ \hline
+        PWUE & 0 & 1 & 2 & 2 & 3 & 3 & 4 & 4 & 5 \\ \hline
+    \end{tabular}
+    \caption{PWUE-Zahlen bis 9}
+    \label{tab:pwue-bis-9}
+\end{table}
+
+Um die PWUE-Zahl von 10 zu ermitteln, sind nur noch alle 9er (gemeint sind Pfannkuchenstapel der Höhe 9) relevant,
+die in $PWUE(9)$ oder $PWUE(9) - 1$ (also $5$ oder $4$) Wende-und-Essoperationen lösbar sind, weil die neue PWUE-Zahl
+mindestens so gro{\ss} ist wie die vorherige und nun eine Wende-und-Essoperation ausgeführt wird.
+Für diese 9er--Stapel werden entsprechend die 8er gebraucht mit $PWUE(8)$ oder $PWUE(8) - 1$
+(also $4$ oder $3$) Wende-und-Essoperationen.
+Für die 8er--Stapel braucht man nun die 7er mit $PWUE(7)$, $PWUE(7) - 1$ und $PWUE(7) - 2$,
+(also $4$, $3$ oder $2$) Wende-und-Essoperationen lösbar sind da sich zwischen 7 und 8 die PWUE-Zahl nicht geändert hat.
+Je niedriger die betrachtete Pfannkuchenhöhe ist, desto mehr Einträge müssen behalten werden.
+Der Übersicht halber wird eine Tabelle, auch im Quellcode, verwendet, man könnte diese Werte aber auch errechnen. \\
+\begin{table}[h]
+    \centering
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+        \hline
+        Höhe h   & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ \hline
+        Anzahl k & 6 & 5 & 5 & 4 & 4 & 3 & 3 & 2 & 2 \\ \hline
+    \end{tabular}
+    \caption{}
+    \label{tab:k-fuer-10}
+\end{table}
+Die Höhe innerhalb der Tabelle meint die Höhe des Stapels und die Anzahl beschreibt die Menge der Lösungen, welche gemerkt werden müssen.
+Eine Anzahl von 2 bedeutet alle Lösungen, welche $PWUE(h)$ und $PWUE(h) - 1$ Wende-und-Essoperationen benötigen. \\
+Nichtsdestotrotz reichte diese Optimierung nicht, um die PWUE-Zahl für 13 zu ermitteln.
 
 
 \section{Umsetzung}\label{sec:umsetzung}
-Die Implementierung erfolgt in Java 17.
+Die Implementierung erfolgt in Java 17. \\
+Die Pfannkuchenstapel werden als Bytearrays dargestellt.
+Um eine PWUE-Zahl einer großen Höhe zu finden, müssen sehr viele Pfannkuchenstapel sortiert werden.
+Um diesen Prozess zu Parallelisieren wird die Reactive Streams \footnote{https://github.com/reactive-streams/reactive-streams-jvm}
+Bibliothek verwendet.
+
+\subsection{Komplexitätsbetrachtung}\label{subsec:komplexitatsbetrachtung}
+Zunächst ein Beispiel.
+Ein Pfannkuchenstapel der Höhe 4 soll sortiert werden.
+Dafür gibt es zunächst 4 mögliche Wende-und-Essoperationen.
+Nun gibt es maximal 4--3er Stapel.
+Auf diese wird wiederum jede mögliche Wende-und-Essoperation ausgeführt.
+Für einen einzelnen 3er-Stapel sind das 3 resultierende 2er-Stapel.
+Für 4--3er Stapel sind es demnach 12--2er Stapel.
+Diese werden wiederum zu 24--1r "Stapel". \\
+Allgemein formuliert sind das $ 1 + n + n*(n-1) + n*(n - 1)*(n-2) + ...$ oder $\sum_{k=1}^{n} \frac{n!}{k!}$.
+Soweit der Brute-Force Ansatz.
+In der Dynamischen Programmierung wird unteranderem ausgenutzt, dass
+es nur maximal $k!$ verschiedene Pfannkuchenstapel der Höhe $k$ gibt.
+Dementsprechend ist für ein jeweiliges k den grö{\ss}eren der beiden Werte aus obigem Summanden und $k!$.
+Im obigen Beispiel gab es 24 Einser, tatsächlich gibt es aber natürlich nur einen Einser (normiert).
 
 
 \section{Beispiele}\label{sec:beispiele}
 
 \subsection{Beispiel Dateien}\label{subsec:beispiel-dateien}
-Es folgen die Pfandkuchenstapel der Beispieldateien und die jeweilige Programmausgabe.
+Es folgen die Pfannkuchenstapel der Beispieldateien und die jeweilige Programmausgabe.
 \subsubsection{pancake0.txt}
 {\obeylines
 
 Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 0: [3, 2, 4, 5] -> [5, 4, 2]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [1, 5, 4, 2, 3]
     [5, 4, 2]
     [0, 0]
@@ -73,7 +142,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 1: [5, 2, 4, 7, 1, 3, 6] -> [5, 6, 3, 1, 7, 4]
     Wende-und-Essoperation an Index 1: [5, 6, 3, 1, 7, 4] -> [5, 4, 7, 1, 3]
     Wende-und-Essoperation an Index 2: [5, 4, 7, 1, 3] -> [5, 4, 3, 1]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [5, 2, 4, 7, 1, 3, 6]
     [5, 4, 3, 1]
     [1, 1, 2]
@@ -84,7 +153,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 5: [2, 4, 6, 3, 8, 1, 7] -> [2, 4, 6, 3, 8, 7]
     Wende-und-Essoperation an Index 3: [2, 4, 6, 3, 8, 7] -> [2, 4, 6, 7, 8]
     Wende-und-Essoperation an Index 0: [2, 4, 6, 7, 8] -> [8, 7, 6, 4]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [2, 4, 6, 3, 5, 7, 1, 8]
     [8, 7, 6, 4]
     [4, 5, 3, 0]
@@ -97,7 +166,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 2: [5, 10, 1, 11, 4, 3, 7, 9] -> [5, 10, 9, 7, 3, 4, 11]
     Wende-und-Essoperation an Index 0: [5, 10, 9, 7, 3, 4, 11] -> [11, 4, 3, 7, 9, 10]
     Wende-und-Essoperation an Index 1: [11, 4, 3, 7, 9, 10] -> [11, 10, 9, 7, 3]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [6, 3, 7, 9, 2, 8, 4, 11, 1, 10, 5]
     [11, 10, 9, 7, 3]
     [0, 5, 8, 2, 0, 1]
@@ -111,7 +180,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 0: [2, 11, 5, 10, 6, 3, 9, 12, 13] -> [13, 12, 9, 3, 6, 10, 5, 11]
     Wende-und-Essoperation an Index 6: [13, 12, 9, 3, 6, 10, 5, 11] -> [13, 12, 9, 3, 6, 10, 11]
     Wende-und-Essoperation an Index 2: [13, 12, 9, 3, 6, 10, 11] -> [13, 12, 11, 10, 6, 3]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [2, 8, 3, 9, 12, 13, 1, 6, 10, 5, 11, 4, 7]
     [13, 12, 11, 10, 6, 3]
     [1, 7, 2, 1, 0, 6, 2]
@@ -124,7 +193,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 2: [13, 10, 8, 2, 3, 5, 6, 12, 1, 14, 9] -> [13, 10, 9, 14, 1, 12, 6, 5, 3, 2]
     Wende-und-Essoperation an Index 5: [13, 10, 9, 14, 1, 12, 6, 5, 3, 2] -> [13, 10, 9, 14, 1, 2, 3, 5, 6]
     Wende-und-Essoperation an Index 3: [13, 10, 9, 14, 1, 2, 3, 5, 6] -> [13, 10, 9, 6, 5, 3, 2, 1]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [11, 5, 6, 12, 1, 14, 9, 7, 3, 2, 8, 10, 13, 4]
     [13, 10, 9, 6, 5, 3, 2, 1]
     [13, 0, 5, 2, 5, 3]
@@ -139,7 +208,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 3: [6, 14, 11, 7, 15, 1, 2, 4, 5, 9] -> [6, 14, 11, 9, 5, 4, 2, 1, 15]
     Wende-und-Essoperation an Index 0: [6, 14, 11, 9, 5, 4, 2, 1, 15] -> [15, 1, 2, 4, 5, 9, 11, 14]
     Wende-und-Essoperation an Index 0: [15, 1, 2, 4, 5, 9, 11, 14] -> [14, 11, 9, 5, 4, 2, 1]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [6, 10, 5, 9, 3, 11, 7, 15, 1, 2, 13, 12, 4, 8, 14]
     [14, 11, 9, 5, 4, 2, 1]
     [1, 4, 6, 2, 7, 3, 0, 0]
@@ -154,12 +223,12 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 5: [16, 14, 1, 9, 8, 5, 10, 15, 2, 6, 7] -> [16, 14, 1, 9, 8, 7, 6, 2, 15, 10]
     Wende-und-Essoperation an Index 2: [16, 14, 1, 9, 8, 7, 6, 2, 15, 10] -> [16, 14, 10, 15, 2, 6, 7, 8, 9]
     Wende-und-Essoperation an Index 3: [16, 14, 10, 15, 2, 6, 7, 8, 9] -> [16, 14, 10, 9, 8, 7, 6, 2]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [11, 16, 14, 1, 9, 12, 4, 2, 6, 13, 7, 3, 15, 10, 5, 8]
     [16, 14, 10, 9, 8, 7, 6, 2]
     [5, 0, 0, 8, 10, 5, 2, 3]
     Benötigte Wende-und-Essoperationen 8
-    \subsection{Weitere Pfandkuchenstapel}\label{sec:weitere-pfandkuchenstapel}
+    \subsection{Weitere Pfannkuchenstapel}\label{sec:weitere-Pfannkuchenstapel}
     \subsubsection{Höhe 18}
 
     Wende-und-Essoperation an Index 3: [17, 10, 8, 14, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 3, 16, 13] -> [17, 10, 8, 13, 16, 3, 7, 15, 1, 2, 18, 9, 4, 5, 11, 6, 12]
@@ -170,7 +239,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     Wende-und-Essoperation an Index 1: [17, 12, 6, 11, 5, 4, 2, 1, 15, 7, 8, 13, 16] -> [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 11, 6]
     Wende-und-Essoperation an Index 10: [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 11, 6] -> [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 6]
     Wende-und-Essoperation an Index 5: [17, 16, 13, 8, 7, 15, 1, 2, 4, 5, 6] -> [17, 16, 13, 8, 7, 6, 5, 4, 2, 1]
-    Ursprünglicher Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
     [17, 10, 8, 14, 12, 6, 11, 5, 4, 9, 18, 2, 1, 15, 7, 3, 16, 13]
     [17, 16, 13, 8, 7, 6, 5, 4, 2, 1]
     [3, 1, 12, 7, 6, 1, 10, 5]
@@ -179,7 +248,7 @@ Wende-und-Essoperation an Index 0: [1, 5, 4, 2, 3] -> [3, 2, 4, 5]
     \subsubsection{Höhe 1}
 
     PWUE of number 1 is 0
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [1]
     [1]
@@ -190,7 +259,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 2}
 
     PWUE of number 2 is 1
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [1, 2]
     [2]
@@ -201,7 +270,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 3}
 
     PWUE of number 3 is 2
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [1, 3, 2]
     [1]
@@ -212,7 +281,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 4}
 
     PWUE of number 4 is 2
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [2, 4, 1, 3]
     [4, 1]
@@ -223,7 +292,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 5}
 
     PWUE of number 5 is 3
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [1, 4, 5, 2, 3]
     [4, 3]
@@ -234,7 +303,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 6}
 
     PWUE of number 6 is 3
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [4, 1, 6, 2, 5, 3]
     [5, 3, 1]
@@ -245,7 +314,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 7}
 
     PWUE of number 7 is 4
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [4, 6, 7, 5, 1, 3, 2]
     [7, 5, 2]
@@ -256,7 +325,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 8}
 
     PWUE of number 8 is 5
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [2, 4, 8, 1, 5, 7, 3, 6]
     [8, 4, 3]
@@ -267,7 +336,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 9}
 
     PWUE of number 9 is 5
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [3, 7, 1, 9, 2, 6, 5, 8, 4]
     [6, 5, 4, 1]
@@ -278,7 +347,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 10}
 
     PWUE of number 10 is 6
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [5, 10, 1, 4, 9, 3, 6, 8, 2, 7]
     [5, 4, 3, 2]
@@ -325,7 +394,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 11}
 
     PWUE of number 11 is 6
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [3, 9, 7, 1, 10, 4, 8, 5, 11, 2, 6]
     [9, 8, 4, 2, 1]
@@ -372,7 +441,7 @@ Example Worstcase Pancakestack
     \subsubsection{Höhe 12}
 
     PWUE of number 12 is 7
-    Pfandkuchenstapel -> Sortierter Pfandkuchenstapel -> Indizes benötigter Operationen
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
 Example Worstcase Pancakestack
     [4, 9, 5, 11, 8, 3, 10, 6, 2, 7, 12, 1]
     [12, 11, 10, 6, 2]
@@ -416,13 +485,484 @@ Example Worstcase Pancakestack
     Sorter map contains 2512306 entries
     Timings report
     Time spend finding PWUE nr 1303151 ms
-    \subsubsection{Höhe 13}
-
-    todo
 }
 
 
 \section{Quellcode}\label{sec:quellcode}
-Unwichtige Teile des Programms sollen hier nicht abgedruckt werden.
-Dieser Teil sollte nicht mehr als 2–3 Seiten umfassen, maximal 10.
+\begin{lstlisting}[label={lst:source}]
 
+@Getter
+@Setter
+@AllArgsConstructor
+public class PancakeStack implements Cloneable {
+    private PancakeStackData normalizedPancakes; // bottom to top
+    private PancakeStackData pancakes; // bottom to top, using actual pancake sizes
+
+    public PancakeStack(Byte[] pancakes) {
+        this.normalizedPancakes = new PancakeStackData(pancakes);
+        this.pancakes = new PancakeStackData(pancakes);
+    }
+
+
+
+    public boolean isSolved() {
+        int last = - 1;
+        for (final Byte pancake : this.normalizedPancakes.getPancakes()) {
+            if (last == - 1) {
+                last = pancake;
+                continue;
+            }
+            if (last <= pancake) {
+                return false;
+            }
+            last = pancake;
+        }
+        return true;
+    }
+}
+
+@Getter
+@AllArgsConstructor
+public class PancakeStackData implements Cloneable {
+    private Byte[] pancakes; // bottom to top
+}
+
+
+public class PancakeStackSorter {
+    private final PancakeFlipper pancakeFlipper;
+    private final PancakeFlippingOrderApplier pancakeFlippingOrderApplier;
+
+    private final Map<PancakeStackData, FlippingOrder> flippingOrderMap = new ConcurrentHashMap<>();
+
+    public PancakeStackSorter(final PancakeFlipper pancakeFlipper, final PancakeFlippingOrderApplier pancakeFlippingOrderApplier) {
+        this.pancakeFlipper = pancakeFlipper;
+        this.pancakeFlippingOrderApplier = pancakeFlippingOrderApplier;
+
+    }
+
+    public int getMapEntryCount() {
+        return this.flippingOrderMap.size();
+    }
+
+
+    public PancakeStackSortingResult sort(PancakeStack pancakeStack) {
+        FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
+        PancakeStack solved = this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
+        return PancakeStackSortingResult.of(flippingOrder, solved, pancakeStack);
+    }
+
+    public PancakeStackSortingResult sort(PancakeStack pancakeStack, boolean debugPrints) {
+        FlippingOrder flippingOrder = this.optimalFlippingOrder(pancakeStack, new FlippingOrder());
+        PancakeStack solved = debugPrints ?
+                this.pancakeFlippingOrderApplier.applyAndPrintDebug(pancakeStack.clone(), flippingOrder) :
+                this.pancakeFlippingOrderApplier.apply(pancakeStack.clone(), flippingOrder);
+        return PancakeStackSortingResult.of(flippingOrder, solved, pancakeStack);
+    }
+
+    private FlippingOrder optimalFlippingOrder(PancakeStack pancakeStack, FlippingOrder flippingOrder) {
+        if (pancakeStack.isSolved()) {
+            return flippingOrder;
+        }
+        if (this.flippingOrderMap.containsKey(pancakeStack.getNormalizedPancakes())) {
+            return flippingOrder.append(this.flippingOrderMap.get(pancakeStack.getNormalizedPancakes()));
+        }
+        Set<FlippingOrder> options = new HashSet<>();
+        for (byte i = 0; i < pancakeStack.getNormalizedPancakes().getPancakes().length; i++) {
+            PancakeStack clonedPancakeStack = pancakeStack.clone();
+            this.pancakeFlipper.flip(clonedPancakeStack, i);
+            FlippingOrder clonedFlippingOrder = flippingOrder.clone();
+            clonedFlippingOrder.add(i);
+            options.add(this.optimalFlippingOrder(clonedPancakeStack, clonedFlippingOrder));
+        }
+
+        FlippingOrder best = findBest(options);
+
+        this.flippingOrderMap.put(pancakeStack.getNormalizedPancakes(),
+                slice(calcSlicingStart(best, pancakeStack),
+                        best));
+        return best;
+    }
+
+    private FlippingOrder findBest(Set<FlippingOrder> flippingOrders) {
+        int length = Integer.MAX_VALUE;
+        FlippingOrder best = null;
+        for (FlippingOrder flippingOrder : flippingOrders) {
+            if (flippingOrder.getFlippingOperations().size() < length) {
+                length = flippingOrder.getFlippingOperations().size();
+                best = flippingOrder;
+            }
+        }
+        return best;
+    }
+
+    private FlippingOrder slice(int from, FlippingOrder flippingOrder) {
+        if (from == 0) {
+            return flippingOrder.clone();
+        }
+        FlippingOrder result = new FlippingOrder();
+        for (int i = from; i < flippingOrder.getFlippingOperations().size(); i++) {
+            result.add(flippingOrder.getFlippingOperations().get(i));
+        }
+        return result;
+    }
+
+    private int calcSlicingStart(FlippingOrder flippingOrder, PancakeStack pancakeStack) {
+        for (int i = flippingOrder.getFlippingOperations().size() - 1; i >= 0; i--) {
+            PancakeStack applied = this
+                    .pancakeFlippingOrderApplier
+                    .apply(pancakeStack.clone(), slice(i, flippingOrder));
+            if (applied.isSolved()) {
+                return i;
+            }
+        }
+        throw new IllegalStateException();
+    }
+}
+
+public class FlippingOrder implements Cloneable {
+    @Getter
+    private final List<Byte> flippingOperations = new ArrayList<>();
+
+    public FlippingOrder add(Byte integer) {
+        this.flippingOperations.add(integer);
+        return this;
+    }
+
+    public FlippingOrder append(FlippingOrder flippingOrder) {
+        FlippingOrder copy = new FlippingOrder();
+        copy.getFlippingOperations().addAll(this.getFlippingOperations());
+        copy.getFlippingOperations().addAll(flippingOrder.getFlippingOperations());
+        return copy;
+    }
+}
+
+
+public class PancakeFlipper {
+
+    /**
+     * Flips the pancake stack between index - 1 and index, then eats the last pancake.
+     * Also performs the same operations on the normalized pancake stack.
+     *
+     * @param pancakeStack The pancake stack to flip and eat.
+     * @param index The index to flip the pancakes.
+     */
+    public void flip(PancakeStack pancakeStack, int index) {
+        Byte[] normalizedPancakes = pancakeStack.getNormalizedPancakes().getPancakes();
+        if (index < 0 || index > normalizedPancakes.length) {
+            throw new IllegalArgumentException("Flip operation out of bounds. Trying to flip between " + (index - 1) +
+                    " and " + index + " but current stack only has " + normalizedPancakes.length + " pancakes!");
+        }
+
+        Byte[] normalizedFlipped = flip(index, normalizedPancakes);
+        byte aboutToBeEaten = normalizedFlipped[normalizedFlipped.length - 1];
+        pancakeStack.setNormalizedPancakes(new PancakeStackData(normalize(eat(normalizedFlipped), aboutToBeEaten)));
+
+        Byte[] pancakes = pancakeStack.getPancakes().getPancakes();
+        Byte[] flipped = flip(index, pancakes);
+        pancakeStack.setPancakes(new PancakeStackData(eat(flipped)));
+    }
+
+    /**
+     * Flips a given pancake stack between index - 1 and index.
+     *
+     * @param index The index to flip the pancakes.
+     * @param pancakes The pancake stack to flip.
+     * @return The flipped pancake stack.
+     */
+    private Byte[] flip(int index, Byte[] pancakes) {
+        if (index == 0 || index == pancakes.length) {
+            return reverse(pancakes);
+        }
+
+        Byte[] flipped = Arrays.copyOf(pancakes, pancakes.length);
+        for (int i = index, j = pancakes.length - 1; i < j; i++, j--) {
+            byte temp = flipped[i];
+            flipped[i] = flipped[j];
+            flipped[j] = temp;
+        }
+
+        return flipped;
+    }
+
+    /**
+     * Removes the last pancake from the stack.
+     *
+     * @param current The pancake stack to remove the last pancake from.
+     * @return The pancake stack with the last pancake removed.
+     */
+    private Byte[] eat(Byte[] current) {
+        Byte[] eaten = new Byte[current.length - 1];
+        System.arraycopy(current, 0, eaten, 0, current.length - 1);
+        return eaten;
+    }
+
+    /**
+     * Adjusts the pancake stack after eating the last pancake.
+     *
+     * @param current The pancake stack to normalize.
+     * @param removed The value of the removed pancake.
+     * @return The normalized pancake stack.
+     */
+    private Byte[] normalize(Byte[] current, byte removed) {
+        for (int i = 0; i < current.length; i++) {
+            byte value = current[i];
+            if (value > removed) {
+                current[i] = (byte) (value - 1);
+            }
+        }
+        return current;
+    }
+
+    /**
+     * Reverses the order of the given pancake stack.
+     *
+     * @param current The pancake stack to reverse.
+     * @return The reversed pancake stack.
+     */
+    private Byte[] reverse(Byte[] current) {
+        Byte[] reversed = Arrays.copyOf(current, current.length);
+        for (int i = 0, j = current.length - 1; i < j; i++, j--) {
+            byte temp = reversed[i];
+            reversed[i] = reversed[j];
+            reversed[j] = temp;
+        }
+        return reversed;
+    }
+
+}
+
+@RequiredArgsConstructor
+public class PancakeFlippingOrderApplier {
+
+    private final PancakeFlipper flipper;
+
+    public PancakeStack apply(PancakeStack pancakeStack, FlippingOrder flippingOrder) {
+        if (flippingOrder.getFlippingOperations().size() == 0) {
+            return pancakeStack;
+        }
+        for (Byte flippingOperation : flippingOrder.getFlippingOperations()) {
+            flipper.flip(pancakeStack, flippingOperation);
+        }
+        return pancakeStack;
+    }
+
+    public PancakeStack applyAndPrintDebug(PancakeStack pancakeStack, FlippingOrder flippingOrder) {
+        if (flippingOrder.getFlippingOperations().size() == 0) {
+            System.out.println(Arrays.toString(pancakeStack.getPancakes().getPancakes()) + " ist bereits gelöst.");
+            return pancakeStack;
+        }
+        for (final Byte flippingOperation : flippingOrder.getFlippingOperations()) {
+            final PancakeStack copy = pancakeStack.clone();
+            flipper.flip(pancakeStack, flippingOperation);
+            System.out.println("Wende-und-Essoperation an Index " + flippingOperation + ": " +
+                    Arrays.toString(copy.getPancakes().getPancakes()) + " -> " +
+                    Arrays.toString(pancakeStack.getPancakes().getPancakes()));
+        }
+        return pancakeStack;
+    }
+
+}
+
+@RequiredArgsConstructor
+public class PWUENumberCalculator {
+
+    private final PancakeStackSorter pancakeStackSorter;
+    private final PancakeFlipper pancakeFlipper;
+
+    private final Map<Integer, AtomicInteger> heightToPWUE = new ConcurrentHashMap<>(); // height to pwue nr
+    private final Map<PancakeStackData, Integer> flippingOrderLengthMap = new ConcurrentHashMap<>(); // pancake stack to flipping order length
+    private final static Byte[][] cleanseOperations = new Byte[][]{
+            new Byte[]{}, // 0
+            new Byte[]{}, // 1
+            new Byte[]{}, // 2
+            new Byte[]{3, 2}, // 3
+            new Byte[]{3, 2, 2}, // 4
+            new Byte[]{4, 3, 3, 2}, // 5
+            new Byte[]{4, 3, 3, 2, 2}, // 6
+            new Byte[]{5, 4, 4, 3, 3, 2}, // 7
+            new Byte[]{5, 4, 4, 3, 3, 2, 2},// 8
+            new Byte[]{6, 5, 5, 4, 4, 3, 3, 2}, // 9
+            new Byte[]{6, 5, 5, 4, 4, 3, 3, 2, 2}, // 10
+            new Byte[]{7, 6, 6, 5, 5, 4, 4, 3, 3, 2}, // 11
+            new Byte[]{7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2}, // 12
+            new Byte[]{8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2} // 13
+    };
+
+
+    private int startedTasks = 0;
+    private final AtomicInteger finishedTasks = new AtomicInteger(0);
+    private final static int BATCH_SIZE = 10000;
+
+
+    // bottom up pwue number generation
+    public PancakeStackSortingResult calcPWUE(int height) {
+        int pwue = this.calcPWUEForHeight(height);
+        return this.findAndSolveStackWithPWUECountAmount(pwue, height);
+    }
+
+    public Set<PancakeStackSortingResult> calcPWUE(int height, int amount) {
+        int pwue = this.calcPWUEForHeight(height);
+        Set<PancakeStackSortingResult> set = new HashSet<>();
+        for (int i = 0; i < amount; i++) {
+            set.add(this.findAndSolveStackWithPWUECountAmount(pwue, height));
+        }
+        return set;
+    }
+
+    private PancakeStackSortingResult findAndSolveStackWithPWUECountAmount(int pwue, int height) {
+        List<Byte> pancakes = this.generateInitialPancakes(height);
+        PancakeStack pancakeStack;
+        PancakeStackSortingResult result;
+        do {
+            Collections.shuffle(pancakes);
+            pancakeStack = new PancakeStack(pancakes.toArray(Byte[]::new));
+            result = this.pancakeStackSorter.sort(pancakeStack);
+        } while (result.getFlippingOrder().getFlippingOperations().size() != pwue);
+        return result;
+    }
+
+    public int calcPWUEForHeight(int height) {
+        this.flippingOrderLengthMap.put(new PancakeStackData(new Byte[]{1}), 0);
+        this.heightToPWUE.put(1, new AtomicInteger(0));
+
+        this.flippingOrderLengthMap.put(new PancakeStackData(new Byte[]{1, 2}), 1);
+        this.heightToPWUE.put(2, new AtomicInteger(1));
+        for (int i = 3; i <= height; i++) {
+            // System.out.println("NOW GENERATING MAP FOR " + i);
+            this.permute(i, i != height);
+            while (startedTasks - finishedTasks.get() != 0) {
+                try {
+                    System.out.println("waiting for " + (startedTasks - finishedTasks.get()) + " tasks");
+                    Thread.sleep(5);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+            if (i != height) {
+                this.cleanse(i, height);
+            }
+        }
+        return this.heightToPWUE.get(height).get();
+    }
+
+    private void cleanse(int current, int max) {
+
+        this.flippingOrderLengthMap.entrySet().removeIf(entry -> {
+            int entryHeight = entry.getKey().getPancakes().length;
+            int entryValue = entry.getValue();
+
+            if (entryHeight <= current - 1) {
+                return true;
+            }
+
+            int pwue = this.heightToPWUE.get(entryHeight).get();
+            return entryValue <= pwue - cleanseOperations[max][current - 1];
+        });
+
+    }
+
+    private void permute(int height, boolean writeToMap) {
+        List<Byte> pancakes = this.generateInitialPancakes(height);
+        permute(pancakes, 0, height, writeToMap);
+    }
+
+    private List<Byte> generateInitialPancakes(int height) {
+        List<Byte> bytes = new ArrayList<>();
+        for (int i = 1; i <= height; i++) {
+            byte b = (byte) i;
+            bytes.add(b);
+        }
+        return bytes;
+    }
+
+    private void permute(List<Byte> pancakes, int height, int initialHeight, boolean writeToMap) {
+        for (int i = height; i < pancakes.size(); i++) {
+            java.util.Collections.swap(pancakes, i, height);
+            permute(pancakes, height + 1, initialHeight, writeToMap);
+            java.util.Collections.swap(pancakes, height, i);
+        }
+        if (height == pancakes.size() - 1) {
+
+            PancakeStack pancakeStack = new PancakeStack(pancakes.toArray(new Byte[0]));
+            while (startedTasks - finishedTasks.get() > BATCH_SIZE) {
+                try {
+                    Thread.sleep(20);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                // TODO: 17.04.2023 this is very hacky
+            }
+            startedTasks++;
+            this.sortAndApplyResults(pancakeStack, writeToMap, height, initialHeight)
+                    .subscribeOn(Schedulers.parallel())
+                    .doOnNext(integer -> finishedTasks.incrementAndGet())
+                    .subscribe();
+        }
+
+    }
+
+
+    private Mono<Integer> sortAndApplyResults(PancakeStack pancakeStack, boolean writeToMap, int height, int initialHeight) {
+        Mono<Integer> mono = !writeToMap && pancakeStack.getPancakes().getPancakes()[0] == height + 1 ?
+                Mono.just(-1) : Mono.just(this.sort(pancakeStack, writeToMap));
+        return mono.doOnNext(requiredFlippingOperationsCount -> {
+            if (requiredFlippingOperationsCount == -1) {
+                return;
+            }
+            AtomicInteger currentWorstCase = heightToPWUE.getOrDefault(initialHeight, new AtomicInteger(Integer.MIN_VALUE));
+            int currentWorstCaseValue = currentWorstCase.get();
+            if (requiredFlippingOperationsCount <= currentWorstCaseValue) {
+                return;
+            }
+            currentWorstCase.compareAndSet(currentWorstCaseValue, requiredFlippingOperationsCount);
+            this.heightToPWUE.put(initialHeight, currentWorstCase);
+        });
+    }
+
+    public int sort(PancakeStack pancakeStack, boolean writeToMap) {
+        return this.optimalFlippingOrder(pancakeStack, writeToMap);
+    }
+
+    private int optimalFlippingOrder(PancakeStack pancakeStack, boolean writeToMap) {
+        if (pancakeStack.isSolved()) {
+            return -1;
+        }
+        Set<Integer> possibleNextOperations = new HashSet<>();
+        for (byte i = 0; i < pancakeStack.getNormalizedPancakes().getPancakes().length; i++) {
+            PancakeStack clonedPancakeStack = pancakeStack.clone();
+            this.pancakeFlipper.flip(clonedPancakeStack, i);
+
+            if (clonedPancakeStack.isSolved()) {
+                this.flippingOrderLengthMap.put(pancakeStack.getNormalizedPancakes(), 1);
+                return 1;
+            }
+
+            if (!this.flippingOrderLengthMap.containsKey(clonedPancakeStack.getNormalizedPancakes())) {
+                return -1;
+            }
+            int operations = this.flippingOrderLengthMap.get(clonedPancakeStack.getNormalizedPancakes());
+            possibleNextOperations.add(operations);
+        }
+
+        if (possibleNextOperations.isEmpty()) return -1;
+        int best = this.findBest(possibleNextOperations) + 1;
+
+        if (writeToMap) {
+            this.flippingOrderLengthMap.put(pancakeStack.getNormalizedPancakes(), best);
+        }
+        return best;
+    }
+
+    private int findBest(Set<Integer> flippingOrders) {
+        int length = Integer.MAX_VALUE;
+        for (Integer integer : flippingOrders) {
+            if (integer < length) {
+                length = integer;
+            }
+        }
+        return length;
+    }
+}
+
+
+\end{lstlisting}

@@ -49,12 +49,7 @@ public class NearestNeighbourHeuristic implements Solver {
             return;
         }
 
-        // System.out.println("nodes unvisited " + open.size());
-        // System.out.println("current node " + current.id());
-
         List<Edge> possibleNext = this.weightedNextEdgeProvider.calcPossibleNext(graph, current, last, open);
-
-        // System.out.println("possible next " + possibleNext);
 
         for (final Edge edge : possibleNext) {
             Node next = edge.flip(current);

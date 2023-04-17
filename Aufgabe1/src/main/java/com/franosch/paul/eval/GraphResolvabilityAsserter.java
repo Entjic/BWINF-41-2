@@ -34,7 +34,6 @@ public class GraphResolvabilityAsserter {
             if (size == 0) {
                 continue;
             }
-            // System.out.println("node " + to.id() + " has " + size + " possible next edges from [" + edge.to().id() + "-" + edge.from().id() + "]");
             return true;
         }
         return false;
