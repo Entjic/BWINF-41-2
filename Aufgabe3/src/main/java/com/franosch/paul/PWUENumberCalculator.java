@@ -20,11 +20,22 @@ public class PWUENumberCalculator {
     private final Map<Integer, AtomicInteger> heightToPWUE = new ConcurrentHashMap<>(); // height to pwue nr
     private final Map<PancakeStackData, Integer> flippingOrderLengthMap = new ConcurrentHashMap<>(); // pancake stack to flipping order length
 
-    private final static int BATCH_SIZE = Runtime.getRuntime().availableProcessors() * 100000;
-
     // bottom up pwue number generation
     public PancakeStackSortingResult calcPWUE(int height) {
         int pwue = this.calcPWUEForHeight(height);
+        return this.findAndSolveStackWithPWUECountAmount(pwue, height);
+    }
+
+    public Set<PancakeStackSortingResult> calcPWUE(int height, int amount) {
+        int pwue = this.calcPWUEForHeight(height);
+        Set<PancakeStackSortingResult> set = new HashSet<>();
+        for (int i = 0; i < amount; i++) {
+            set.add(this.findAndSolveStackWithPWUECountAmount(pwue, height));
+        }
+        return set;
+    }
+
+    private PancakeStackSortingResult findAndSolveStackWithPWUECountAmount(int pwue, int height) {
         List<Byte> pancakes = this.generateInitialPancakes(height);
         PancakeStack pancakeStack;
         PancakeStackSortingResult result;
@@ -84,9 +95,7 @@ public class PWUENumberCalculator {
 
     private void permute(int height, boolean writeToMap) {
         List<Byte> pancakes = this.generateInitialPancakes(height);
-        List<Mono<Integer>> monoList = new ArrayList<>();
-        permute(pancakes, 0, height, monoList, writeToMap);
-        Flux.merge(monoList).blockLast();
+        permute(pancakes, 0, height, writeToMap);
     }
 
     private List<Byte> generateInitialPancakes(int height) {
@@ -98,10 +107,10 @@ public class PWUENumberCalculator {
         return bytes;
     }
 
-    private void permute(List<Byte> pancakes, int height, int initialHeight, List<Mono<Integer>> monoList, boolean writeToMap) {
+    private void permute(List<Byte> pancakes, int height, int initialHeight, boolean writeToMap) {
         for (int i = height; i < pancakes.size(); i++) {
             java.util.Collections.swap(pancakes, i, height);
-            permute(pancakes, height + 1, initialHeight, monoList, writeToMap);
+            permute(pancakes, height + 1, initialHeight, writeToMap);
             java.util.Collections.swap(pancakes, height, i);
         }
         if (height == pancakes.size() - 1) {
@@ -124,12 +133,7 @@ public class PWUENumberCalculator {
                         // System.out.println("added to pwue map key " + initialHeight + " value " + currentWorstCase.get());
                         // System.out.println("pwue map " + heightToPWUE);
                     }).subscribe();
-//            monoList.add(mono);
-//            if (monoList.size() > BATCH_SIZE) {
-//                final List<Mono<Integer>> copy = new ArrayList<>(monoList);
-//                Flux.merge(monoList).blockLast();
-//                monoList.removeAll(copy);
-//            }
+
         }
     }
 
