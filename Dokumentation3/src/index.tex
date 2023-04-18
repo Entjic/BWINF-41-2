@@ -5,16 +5,16 @@
 
 
 \section{Lösungsidee}\label{sec:losungsidee}
-Im Nachfogeldenen meint ein Sortierter Pfannkuchenstapel einen
-Pfannkuchenstapel bei dem der grö{\ss}te Pfannkuchen ganz unten,
+Im Nachfolgenden meint ein sortierter Pfannkuchenstapel einen
+Pfannkuchenstapel, bei dem der grö{\ss}te Pfannkuchen ganz unten,
 der zweitgrö{\ss}te darüber etc. liegt. \\
 \subsection{Pfannkuchen-Sortierer}\label{subsec:pfannkuchen-sortierer}
 Um Pfannkuchenstapel zu sortieren, wird die Technik des Dynamic Programmings verwendet.
 Idee ist es, das Problem, also den zu sortierenden Pfannkuchenstapel, in identische Teilprobleme zu zerlegen.
 Im Kontext der Aufgabe bedeutet das, an allen möglichen Indizes die Wende-und-Essoperation beginnen zu lassen.
 Der jeweilige Index der Wende-und-Essoperation wird gemerkt.
-Nach jeder Wende-und-Essoperation wird der resultierende Pfandkuchen gemä{\ss} seiner neuen Höhe normiert.
-Das bedeutet alle Pfandkuchen, die grö{\ss}er als der gegessen Pfandkuchen sind, werden in ihrer Grö{\ss}e um eins reduziert.
+Nach jeder Wende-und-Essoperation wird der resultierende Pfannkuchen gemä{\ss} seiner neuen Höhe normiert.
+Das bedeutet alle Pfannkuchen, die grö{\ss}er als der gegessene Pfannkuchen sind, werden in ihrer Grö{\ss}e um eins reduziert.
 Damit ist gewährleistet, dass ein Pfannkuchenstapel [9,3,7] genauso behandelt werden kann wie der Stapel [3,1,2].
 Dieses Verfahren wird so lange wiederholt, bis der Pfannkuchenstapel sortiert ist.
 Die möglichen Abfolgen von Wende-und-Essoperationen zur Sortierung eines Pfannkuchenstapels werden gesammelt
@@ -51,7 +51,7 @@ Dadurch kann durch die \textit{Absenz von Einträgen} Information ausgedrückt w
 Konkret werden, alle Einträge von $n - 1$ gelöscht.
 \subsection{13er PWUE-Zahl}\label{subsec:13er-pwue-zahl}
 Für PWUE-Zahlen kleiner gleich 12 reicht das bis hierhin beschriebene Verfahren aus.
-Für die PWUE-Zahl 13 wurde folgende Optimierung versucht.
+Für die PWUE-Zahl 13 wird folgende Optimierung verwendet.
 Nachdem die PWUE-Zahl einer Zahl $n$ ermittelt wurde, werden alle Einträge gelöscht, welche eine so kurze Zugfolge
 aufweisen, sodass sie für die PWUE-Zahl von $n + 1$ nicht relevant sind.
 Die Zugfolge ist genau dann zu kurz, wenn sie kleiner gleich $PWUE(n) - k$ ist.
@@ -91,22 +91,80 @@ Der Übersicht halber wird eine Tabelle, auch im Quellcode, verwendet, man könn
         Höhe h   & 1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\ \hline
         Anzahl k & 6 & 5 & 5 & 4 & 4 & 3 & 3 & 2 & 2 \\ \hline
     \end{tabular}
-    \caption{}
     \label{tab:k-fuer-10}
 \end{table}
 Die Höhe innerhalb der Tabelle meint die Höhe des Stapels und die Anzahl beschreibt die Menge der Lösungen, welche gemerkt werden müssen.
 Eine Anzahl von 2 bedeutet alle Lösungen, welche $PWUE(h)$ und $PWUE(h) - 1$ Wende-und-Essoperationen benötigen. \\
-Nichtsdestotrotz reichte diese Optimierung nicht, um die PWUE-Zahl für 13 zu ermitteln.
+Somit können einige Einträge gespart werden.
 
 
 \section{Umsetzung}\label{sec:umsetzung}
 Die Implementierung erfolgt in Java 17. \\
 Die Pfannkuchenstapel werden als Bytearrays dargestellt.
-Um eine PWUE-Zahl einer großen Höhe zu finden, müssen sehr viele Pfannkuchenstapel sortiert werden.
+Um eine PWUE-Zahl einer gro{\ss}en Höhe zu finden, müssen sehr viele Pfannkuchenstapel sortiert werden.
 Um diesen Prozess zu Parallelisieren wird die Reactive Streams \footnote{https://github.com/reactive-streams/reactive-streams-jvm}
-Bibliothek verwendet.
+Bibliothek verwendet. \\
 
-\subsection{Komplexitätsbetrachtung}\label{subsec:komplexitatsbetrachtung}
+Die in~\ref{subsec:13er-pwue-zahl} angesprochene Tabelle sieht wie folgt aus:
+\begin{lstlisting}[label={lst:table}]
+    private final static Byte[][] cleanseOperations = new Byte[][]{
+            new Byte[]{}, // 0
+            new Byte[]{}, // 1
+            new Byte[]{}, // 2
+            new Byte[]{3, 2}, // 3
+            new Byte[]{3, 2, 2}, // 4
+            new Byte[]{4, 3, 3, 2}, // 5
+            new Byte[]{4, 3, 3, 2, 2}, // 6
+            new Byte[]{5, 4, 4, 3, 3, 2}, // 7
+            new Byte[]{5, 4, 4, 3, 3, 2, 2},// 8
+            new Byte[]{6, 5, 5, 4, 4, 3, 3, 2}, // 9
+            new Byte[]{6, 5, 5, 4, 4, 3, 3, 2, 2}, // 10
+            new Byte[]{7, 6, 6, 5, 5, 4, 4, 3, 3, 2}, // 11
+            new Byte[]{7, 6, 6, 5, 5, 4, 4, 3, 3, 2, 2}, // 12
+            new Byte[]{8, 7, 7, 6, 6, 5, 5, 4, 4, 3, 3, 2} // 13
+    };
+\end{lstlisting}
+Diese Tabelle wird in der Methode \#cleanse verwendet um die oben erklärten Fälle zu löschen.
+\begin{lstlisting}[label={lst:cleanse}]
+    private void cleanse(int current, int max) {
+
+    this.flippingOrderLengthMap.entrySet().removeIf(entry -> {
+        int entryHeight = entry.getKey().getPancakes().length;
+        int entryValue = entry.getValue();
+
+        if (entryHeight <= current - 1) {
+            return true;
+        }
+
+        int pwue = this.heightToPWUE.get(entryHeight).get();
+        return entryValue <= pwue - cleanseOperations[max][current - 1];
+    });
+
+}
+\end{lstlisting}
+
+Um alle Permutationen von Pfannkuchenstapel einer gewissen Höhe zu bekommen wird die Methode \#perumte verwendet.
+
+\begin{lstlisting}[label={lst:permute}]
+    private void permute(List<Byte> pancakes, int height, int initialHeight) {
+        for (int i = height; i < pancakes.size(); i++) {
+            java.util.Collections.swap(pancakes, i, height);
+            permute(pancakes, height + 1, initialHeight);
+            java.util.Collections.swap(pancakes, height, i);
+        }
+        if (height == pancakes.size() - 1) {
+            this.sortAndApplyResults(pancakeStack, height, initialHeight)
+                    .subscribeOn(Schedulers.parallel())
+                    .doOnNext(integer -> finishedTasks.incrementAndGet())
+                    .subscribe();
+        }
+    }
+\end{lstlisting}
+
+Es werden $\frac{1}{n}$ der Pfannkuchen nicht betrachtet, da diese mit dem Pfannkuchen mit der
+Grö{\ss}e $n$ an unterster Stelle beginnnen und somit einem Pfannkuchenstapel der Höhe $n - 1$ entsprechen.
+
+\section{Komplexitätsbetrachtung}\label{subsec:komplexitatsbetrachtung}
 Zunächst ein Beispiel.
 Ein Pfannkuchenstapel der Höhe 4 soll sortiert werden.
 Dafür gibt es zunächst 4 mögliche Wende-und-Essoperationen.
@@ -485,6 +543,64 @@ Example Worstcase Pancakestack
     Sorter map contains 2512306 entries
     Timings report
     Time spend finding PWUE nr 1303151 ms
+\subsubsection{Höhe 13}
+    PWUE of number 13 is 7
+    Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Wende-und-Essoperationen
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [12, 9, 3, 11, 1, 6, 8, 2, 5, 10, 4, 7, 13]
+    [11, 9, 8, 6, 5, 4]
+    [11, 2, 0, 1, 6, 2, 5]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [5, 8, 11, 9, 6, 1, 12, 4, 2, 10, 3, 13, 7]
+    [13, 12, 11, 9, 6, 2]
+    [0, 0, 0, 2, 5, 1, 2]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [6, 11, 4, 3, 8, 12, 5, 13, 2, 9, 10, 7, 1]
+    [13, 12, 10, 9, 4, 3]
+    [1, 5, 0, 9, 1, 1, 2]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [5, 1, 2, 10, 8, 3, 13, 4, 12, 6, 9, 7, 11]
+    [10, 8, 7, 6, 4, 1]
+    [2, 0, 3, 8, 4, 6, 2]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [8, 7, 4, 9, 6, 3, 5, 1, 11, 10, 13, 2, 12]
+    [13, 10, 9, 6, 3, 1]
+    [0, 0, 0, 0, 0, 2, 5]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [11, 3, 6, 4, 7, 13, 5, 12, 9, 1, 10, 2, 8]
+    [12, 9, 7, 6, 3, 2]
+    [0, 2, 6, 4, 7, 4, 0]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [3, 10, 4, 6, 13, 5, 11, 2, 8, 9, 12, 1, 7]
+    [12, 9, 8, 7, 6, 5]
+    [1, 6, 6, 8, 2, 0, 3]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [1, 2, 10, 5, 11, 8, 6, 12, 7, 13, 4, 3, 9]
+    [13, 7, 6, 5, 3, 2]
+    [0, 2, 6, 8, 5, 0, 4]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [4, 10, 2, 8, 9, 6, 1, 11, 7, 12, 5, 3, 13]
+    [13, 12, 9, 8, 2, 1]
+    [0, 2, 1, 9, 5, 2, 6]
+    Example Worstcase Pancakestack
+    Ursprünglicher Pfannkuchenstapel -> Sortierter Pfannkuchenstapel -> Indizes benötigter Operationen
+    [3, 8, 2, 9, 7, 4, 10, 13, 6, 5, 11, 1, 12]
+    [13, 12, 11, 9, 7, 4]
+    [1, 0, 9, 6, 4, 0, 3]
+    Sorter map contains 516671 entries
+    Timings report
+    Time spend finding PWUE nr 26150971 ms
+    Du befindest dich nun im PWUE-Zahl Modus.
+    Bitte gib die Höhe des Pfannkuchenstapels an für die die PWUE-Zahl ermittelt werden soll!
 }
 
 
